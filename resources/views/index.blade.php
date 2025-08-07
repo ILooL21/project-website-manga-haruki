@@ -14,14 +14,26 @@
     <p>Name: {{ Auth::user()->name }}</p>
     <p>Email: {{ Auth::user()->email }}</p>
     <br>
-    <a href="{{ route('login') }}">Login</a>
+    {{-- jika ada auth munculkan profile jika tidak login register --}}
+    @if (Auth::check())
+        <a href="{{ route('profile') }}">Profile</a>
+        <br>
+        <br>
+        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    @else
+        <a href="{{ route('login') }}">Login</a>
+        <br>
+        <a href="{{ route('register') }}">Register</a>
+    @endif
     <br>
-    <a href="{{ route('register') }}">Register</a>
     <br>
-    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-        @csrf
-        <button type="submit">Logout</button>
-    </form>
+
+    @if (Auth::user()->role === 'Admin' || Auth::user()->role === 'Super Admin')
+        <a href="{{ route('admin.dashboard') }}">Go to Admin Dashboard</a>
+    @endif
 
     @if (session('status'))
        <p>Status: {{ session('status') }}</p>

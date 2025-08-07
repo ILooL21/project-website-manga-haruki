@@ -73,57 +73,60 @@ class AuthController extends Controller
         ]);
     }
 
-    // public function profile()
-    // {
-    //     $user = Auth::user();
-    //     return view('profile', compact('user'));
-    // }
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('auth.profile', compact('user'));
+    }
 
-    // public function updateProfile(Request $request)
-    // {
-    //     $user = Auth::user();
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
 
-    //     // Validate profile data
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-    //     ]);
+        // Validate profile data
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ]);
 
-    //     // Update user profile
-    //     User::where('id', $user->id)->update([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //     ]);
+        // Update user profile
+        User::where('id', $user->id)->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
 
-    //     return redirect()->route('profile')->with([
-    //         'status' => 'success',
-    //         'message' => 'Profile updated successfully!'
-    //     ]);
-    // }
+        return redirect()->route('profile')->with([
+            'status' => 'success',
+            'message' => 'Profile updated successfully!'
+        ]);
+    }
 
-    // public function changePassword(Request $request)
-    // {
-    //     $user = Auth::user();
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
 
-    //     // Validate password change data
-    //     $request->validate([
-    //         'current_password' => 'required|string',
-    //         'new_password' => 'required|string|min:8|confirmed',
-    //     ]);
+        // Validate password change data
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
 
-    //     // Check if the current password is correct
-    //     if (!Hash::check($request->current_password, $user->password)) {
-    //         return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
-    //     }
+        // Check if the current password is correct
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->route('profile')->with([
+                'status' => 'error',
+                'message' => 'Current password is incorrect.'
+            ]);
+        }
 
-    //     // Update the password
-    //     User::where('id', $user->id)->update([
-    //         'password' => Hash::make($request->new_password),
-    //     ]);
+        // Update the password
+        User::where('id', $user->id)->update([
+            'password' => Hash::make($request->new_password),
+        ]);
 
-    //     return redirect()->route('profile')->with([
-    //         'status' => 'success',
-    //         'message' => 'Password changed successfully!'
-    //     ]);
-    // }
+        return redirect()->route('profile')->with([
+            'status' => 'success',
+            'message' => 'Password changed successfully!'
+        ]);
+    }
 }
