@@ -21,7 +21,7 @@ class CheckRole
         $allowedRoles = explode('|', $roles);
 
         if (!in_array($userRoles, $allowedRoles)) {
-            return redirect()->route('index')->with([
+            return redirect()->route('landing-page.index')->with([
                 'status' => 'error',
                 'message' => 'You do not have permission to access this page.'
             ]);
