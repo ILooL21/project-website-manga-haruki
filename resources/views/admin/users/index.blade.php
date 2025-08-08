@@ -1,5 +1,7 @@
 @extends('admin.layouts.app')
+
 @section('title', 'Tabel Data Pengguna')
+
 @section('content')
     <h2>Tabel Data Pengguna</h2>
     <br>
@@ -39,7 +41,8 @@
                        </form>
                     </td>
                 </tr>
-            @endforeach
+                @endforeach
+            @endif
         </tbody>
     </table>
 
@@ -48,6 +51,5 @@
         <h2>Pesan Status</h2>
         <p>Status: {{ session('status') }}</p>
         <p>Message: {{ session('message') }}</p>
-        <br>
     @endif
 @endsection
