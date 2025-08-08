@@ -3,12 +3,14 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\LandingPage\HalamanAwalController;
+use App\Http\Controllers\MangaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
 // Rute untuk halaman awal
-Route::get('/', [App\Http\Controllers\LandingPage\HalamanAwalController::class, 'index'])->name('landing-page.index');
+Route::get('/', [HalamanAwalController::class, 'index'])->name('landing-page.index');
 
 // Rute untuk pengguna yang belum terautentikasi.
 Route::middleware('guest')->group(function () {
@@ -53,6 +55,15 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/genres/{id}/edit', [GenreController::class, 'edit'])->name('admin.genres.edit');
         Route::put('admin/genres/{id}', [GenreController::class, 'update'])->name('admin.genres.update');
         Route::delete('admin/genres/{id}', [GenreController::class, 'destroy'])->name('admin.genres.destroy');
+
+        // route admin untuk manga
+        Route::get('admin/mangas', [MangaController::class, 'index'])->name('admin.mangas');
+        Route::get('admin/mangas/create', [MangaController::class, 'create'])->name('admin.mangas.create');
+        Route::post('admin/mangas', [MangaController::class, 'store'])->name('admin.mangas.store');
+        Route::get('admin/mangas/{id}/show', [MangaController::class, 'show'])->name('admin.mangas.show');
+        Route::get('admin/mangas/{id}/edit', [MangaController::class, 'edit'])->name('admin.mangas.edit');
+        Route::put('admin/mangas/{id}', [MangaController::class, 'update'])->name('admin.mangas.update');
+        Route::delete('admin/mangas/{id}', [MangaController::class, 'destroy'])->name('admin.mangas.destroy');
     });
 
     // route untuk logout

@@ -3,6 +3,7 @@
 @section('title', 'Tabel Data Pengguna')
 
 @section('content')
+<div style="border: 1px solid #ccc; padding: 20px; margin-bottom: 20px;">
     <h2>Tabel Data Pengguna</h2>
     <br>
     <p>Berikut adalah daftar pengguna terdaftar:</p>
@@ -45,6 +46,7 @@
             @endif
         </tbody>
     </table>
+</div>
 
     @if (session('status'))
         <br>
