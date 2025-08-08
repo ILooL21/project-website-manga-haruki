@@ -6,6 +6,10 @@ use App\Http\Controllers\GenreController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+
+// Rute untuk halaman awal
+Route::get('/', [App\Http\Controllers\LandingPage\HalamanAwalController::class, 'index'])->name('landing-page.index');
+
 // Rute untuk pengguna yang belum terautentikasi.
 Route::middleware('guest')->group(function () {
     // route untuk login
@@ -19,11 +23,6 @@ Route::middleware('guest')->group(function () {
 
 // Rute untuk pengguna yang sudah terautentikasi.
 Route::middleware('auth')->group(function () {
-    // route untuk home
-    Route::get('/', function () {
-        return view('index');
-    })->name('index');
-
     // route untuk profile
     Route::get('profile', [AuthController::class, 'profile'])->name('profile');
     Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile.update');
