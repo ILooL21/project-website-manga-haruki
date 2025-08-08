@@ -61,6 +61,65 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+# Project Website Manga Haruki
+
+## Installation
+
+Follow these steps to set up the project locally:
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/ILooL21/project-website-manga-haruki.git
+   cd project-website-manga-haruki
+   ```
+
+2. **Install dependencies**:
+   - Install PHP dependencies:
+     ```bash
+     composer install
+     ```
+   - Install Node.js dependencies:
+     ```bash
+     npm install
+     ```
+
+3. **Set up environment variables**:
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Update `.env` with your database and other configuration details.
+
+4. **Generate application key**:
+   ```bash
+   php artisan key:generate
+   ```
+
+5. **Run migrations**:
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Build assets**:
+   ```bash
+   npm run dev
+   ```
+
+7. **Start the development server**:
+   ```bash
+   php artisan serve
+   ```
+
+8. **Access the application**:
+   Open your browser and navigate to `http://localhost:8000`.
+
+## Requirements
+
+- PHP >= 8.0
+- Composer
+- Node.js & npm
+- A database (e.g., MySQL, PostgreSQL, SQLite)
+
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

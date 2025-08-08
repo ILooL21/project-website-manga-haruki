@@ -1,0 +1,129 @@
+@extends('landing-page.layouts.main')
+
+@section('content')
+    <div x-data="{
+        mangas: [{
+                chapter: '249',
+                title: 'Mercenary Enrollment',
+                desc: 'Yu Ijin adalah satu-satunya yang selamat dari kecelakaan pesawat saat dia masih kecil. Setelah menjadi tentara bayaran untuk bertahan hidup selama 10 tahun, ia kembali ke keluarganya di kampung.',
+                genres: ['Action', 'Drama', 'Romance', 'School Life', 'Sci-fi'],
+                img: 'images/pomu.webp',
+                url: '#'
+            },
+            // Tambahkan manga lain di sini
+        ],
+        current: 0,
+        next() { this.current = (this.current + 1) % this.mangas.length },
+        prev() { this.current = (this.current - 1 + this.mangas.length) % this.mangas.length },
+        goTo(idx) { this.current = idx },
+    }"
+        class="relative w-full h-[500px] flex items-center justify-center bg-[#1a1625] overflow-hidden rounded-xl mx-auto max-w-7xl">
+        <!-- Background Blur -->
+        <template x-for="(manga, idx) in mangas" :key="idx">
+            <div x-show="current === idx" class="absolute inset-0 w-full h-full z-0">
+                <img :src="'{{ asset('') }}' + manga.img" alt="cover"
+                    class="object-cover w-full h-full blur-lg opacity-40">
+            </div>
+        </template>
+        <!-- Carousel Content -->
+        <div class="relative z-10 w-full flex items-center justify-between px-8 py-8">
+            <!-- Manga Detail -->
+            <div class="w-full md:w-1/2 text-white">
+                <template x-for="(manga, idx) in mangas" :key="idx">
+                    <div x-show="current === idx" class="transition-all duration-500">
+                        <div class="text-lg font-semibold mb-2">Chapter: <span x-text="manga.chapter"></span></div>
+                        <div class="text-4xl md:text-5xl font-bold mb-4" x-text="manga.title"></div>
+                        <div class="mb-6 text-lg" x-text="manga.desc"></div>
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <template x-for="genre in manga.genres" :key="genre">
+                                <span class="px-4 py-1 rounded-md bg-white/10 border border-white/20 text-sm font-medium"
+                                    x-text="genre"></span>
+                            </template>
+                        </div>
+                        <a :href="manga.url"
+                            class="inline-flex items-center px-6 py-3 bg-yellow-400 text-black font-semibold rounded-lg shadow hover:bg-yellow-500 transition">
+                            Start Reading
+                            <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </template>
+            </div>
+            <!-- Manga Cover -->
+            <div class="hidden md:flex w-1/2 justify-end items-center">
+                <template x-for="(manga, idx) in mangas" :key="idx">
+                    <div x-show="current === idx" class="transition-all duration-500">
+                        <img :src="'{{ asset('') }}' + manga.img" alt="cover"
+                            class="w-[350px] h-[480px] object-cover rounded-xl shadow-2xl border-4 border-white/20"
+                            style="transform: skewX(-10deg);">
+                    </div>
+                </template>
+            </div>
+        </div>
+        <!-- Indicators -->
+        <div class="absolute bottom-8 right-8 flex gap-3 z-20">
+            <template x-for="(manga, idx) in mangas" :key="idx">
+                <button @click="goTo(idx)" :class="current === idx ? 'bg-purple-400' : 'bg-white/30'"
+                    class="w-4 h-4 rounded-full transition"></button>
+            </template>
+        </div>
+        <!-- Controls -->
+        <button @click="prev"
+            class="absolute top-1/2 left-6 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/60 rounded-full p-3 focus:outline-none">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <button @click="next"
+            class="absolute top-1/2 right-6 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/60 rounded-full p-3 focus:outline-none">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="container mx-auto px-4 my-12">
+        <div class="grid grid-cols-12 gap-6">
+            <div class="col-span-12 md:col-span-6 lg:col-span-8 card bg-base-100 shadow-sm">
+                <!-- Iklan Section -->
+                <div class="flex flex-col items-center justify-center py-8">
+                    <span class="text-sm text-gray-500 mb-2">Sponsored</span>
+                    <figure>
+                        <img src="https://via.placeholder.com/600x200?text=Iklan+Banner" alt="Iklan" class="rounded-lg shadow-md" />
+                    </figure>
+                    <div class="mt-4 text-center">
+                        <h2 class="text-lg font-semibold">Iklan Spesial</h2>
+                        <p class="text-gray-600">Dapatkan penawaran menarik hanya di sini! Klik gambar untuk info lebih lanjut.</p>
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-warning">Lihat Iklan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-12 md:col-span-6 lg:col-span-4 card bg-base-100 shadow-sm">
+                <!-- Riwayat Baca Pengguna -->
+                <div class="card-body">
+                    <h2 class="card-title">Riwayat Baca Anda</h2>
+                    <ul class="space-y-4">
+                        <!-- Contoh riwayat, ganti dengan data dinamis jika tersedia -->
+                        <li class="flex items-center gap-3">
+                            <img src="images/pomu.webp" alt="Mercenary Enrollment" class="w-12 h-16 object-cover rounded shadow">
+                            <div>
+                                <a href="#" class="font-semibold text-base hover:underline">Mercenary Enrollment</a>
+                                <div class="text-sm text-gray-500">Chapter 249 • Terakhir dibaca 2 hari lalu</div>
+                            </div>
+                        </li>
+                        <!-- Tambahkan riwayat lain di sini -->
+                    </ul>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="#" class="btn btn-primary">Lihat Semua Riwayat</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Tambahkan lebih banyak kartu di sini -->
+        </div>
+    </div>
+</div>
+@endsection
