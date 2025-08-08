@@ -45,6 +45,12 @@ class User extends Authenticatable
         ];
     }
 
+    // hasrole
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
     // Relasi: Satu User (sebagai author) bisa punya banyak Manga
     public function mangas()
     {
