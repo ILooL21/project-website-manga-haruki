@@ -4,6 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\LandingPage\HalamanAwalController;
+use App\Http\Controllers\LandingPage\MangaListController;
+use App\Http\Controllers\LandingPage\ProjectListController;
+use App\Http\Controllers\LandingPage\DetailMangaController;
+use App\Http\Controllers\LandingPage\MangaPagesController;
 use App\Http\Controllers\MangaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 
 // Rute untuk halaman awal
 Route::get('/', [HalamanAwalController::class, 'index'])->name('landing-page.index');
+Route::get('/manga-list', [MangaListController::class, 'index'])->name('landing-page.manga_list');
+Route::get('/project-list', [ProjectListController::class, 'index'])->name('landing-page.project_list');
+Route::get('/manga/{id}', [DetailMangaController::class, 'index'])->name('landing-page.detail_manga');    
+Route::get('/manga/{manga_id}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');
+Route::get('/manga-dummy/chapter/{chapter}', [MangaPagesController::class, 'indexDummy'])->name('landing-page.manga_pages_dummy');
 
 // Rute untuk pengguna yang belum terautentikasi.
 Route::middleware('guest')->group(function () {
