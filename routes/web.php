@@ -8,6 +8,7 @@ use App\Http\Controllers\LandingPage\MangaListController;
 use App\Http\Controllers\LandingPage\ProjectListController;
 use App\Http\Controllers\LandingPage\DetailMangaController;
 use App\Http\Controllers\LandingPage\MangaPagesController;
+use App\Http\Controllers\TestDashboardController;
 use App\Http\Controllers\MangaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,17 @@ Route::get('/project-list', [ProjectListController::class, 'index'])->name('land
 Route::get('/manga/{id}', [DetailMangaController::class, 'index'])->name('landing-page.detail_manga');    
 Route::get('/manga/{manga_id}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');
 Route::get('/manga-dummy/chapter/{chapter}', [MangaPagesController::class, 'indexDummy'])->name('landing-page.manga_pages_dummy');
+
+// Rute untuk test dashboard
+Route::get('/test-dashboard', [TestDashboardController::class, 'index'])->name('test-dashboard.index');
+Route::get('/test-dashboard/manga', [TestDashboardController::class, 'indexManga'])->name('test-dashboard.index_manga');
+Route::get('/test-dashboard/manga/{manga}/chapters', [TestDashboardController::class, 'viewChapters'])->name('manga.chapters');
+Route::post('/test-dashboard/manga/{manga}/chapters', [TestDashboardController::class, 'storeChapter'])
+    ->middleware('auth')
+    ->name('manga.chapters.store');
+Route::get('/test-dashboard/chapter/{chapter}/pages', [TestDashboardController::class, 'viewPages'])->name('chapter.pages');
+Route::post('/test-dashboard/chapter/{chapter}/pages/reorder', [TestDashboardController::class, 'reorderPages'])->name('chapter.pages.reorder');
+Route::get('/test-dashboard/genres', [TestDashboardController::class, 'viewGenres'])->name('genres.index');
 
 // Rute untuk pengguna yang belum terautentikasi.
 Route::middleware('guest')->group(function () {

@@ -123,7 +123,7 @@
                         <!-- Tambahkan riwayat lain di sini -->
                     </ul>
                     <div class="card-actions justify-end mt-4">
-                        <a href="#" class="btn btn-primary">Lihat Semua Riwayat</a>
+                        <a href="#" class="btn btn-secondary">Lihat Semua Riwayat</a>
                     </div>
                 </div>
             </div>
