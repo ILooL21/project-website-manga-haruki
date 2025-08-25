@@ -9,22 +9,15 @@ class GenreController extends Controller
 {
     public function index()
     {
-        $genres = Genre::orderBy('created_at', 'desc')->get();
+        $genres = Genre::withCount('mangas')->orderBy('created_at', 'desc')->get();
         return view('admin.genres.index', compact('genres'));
-    }
-
-    public function create()
-    {
-        return view('admin.genres.form', [
-            'formType' => 'create'
-        ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255'
+            'slug' => 'required|string|max:255|unique:genres,slug'
         ]);
 
         Genre::create([
@@ -38,20 +31,10 @@ class GenreController extends Controller
         ]);
     }
 
-    public function show($id)
-    {
-        $genre = Genre::findOrFail($id);
-        return view('admin.genres.form', [
-            'formType' => 'show',
-            'genre' => $genre
-        ]);
-    }
-
     public function edit($id)
     {
         $genre = Genre::findOrFail($id);
-        return view('admin.genres.form', [
-            'formType' => 'edit',
+        return view('admin.genres.edit', [
             'genre' => $genre
         ]);
     }

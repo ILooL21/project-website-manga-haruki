@@ -15,18 +15,10 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
-    {
-        return view('admin.users.form', [
-            'formType' => 'create'
-        ]);
-    }
-
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.form', [
-            'formType' => 'show',
+        return view('admin.users.show', [
             'userData' => $user
         ]);
     }
@@ -34,8 +26,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.form', [
-            'formType' => 'edit',
+        return view('admin.users.edit', [
             'userData' => $user
         ]);
     }
@@ -44,7 +35,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
         ]);
 
         User::create([
@@ -66,7 +57,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8',
             'role' => 'required|string|in:User,Admin',
         ]);
 

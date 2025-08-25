@@ -1,8 +1,18 @@
-@extends('dashboard-untuk-ilul.layouts.main')
+@extends('admin.layouts.app')
 
-<link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+@section('title', 'Tabel Data Page')
+
+@section('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+    <style>
+        /* Menyembunyikan elemen dengan x-cloak sampai Alpine.js selesai dimuat */
+        [x-cloak] { display: none !important; }
+    </style>
+@endsection
 
 @section('content')
+
+<div x-data="{ open:false, title:'', description:'', status:'ongoing', genresText:'', reset(){ this.title=''; this.description=''; this.status='ongoing'; this.genresText=''; }, }">
     <!-- Page Heading -->
     <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
         <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">
@@ -75,9 +85,19 @@
         </div>
     </div>
     <!-- END Page Section -->
+</div>
+    @if (session('status'))
+    <div class="fixed bottom-5 right-5 z-50">
+        <div class="rounded-lg bg-green-100 p-4 text-green-700 shadow-lg">
+            <p><strong>Status:</strong> {{ session('status') }}</p>
+            <p>{{ session('message') }}</p>
+        </div>
+    </div>
+    @endif
 @endsection
 
-<!-- jQuery and DataTables JS -->
+@section('scripts')
+    <!-- jQuery and DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
 <!-- RowReorder extension -->
@@ -97,7 +117,10 @@
             ordering: false,
             columnDefs: [
                 { targets: [0, 3], orderable: false },
-            ]
+            ],
+            "language": {
+                "emptyTable": "Tidak ada data pages ditemukan.",
+            },
         });
 
         function renumberRows() {
@@ -129,8 +152,8 @@
 
             // Send to backend
             $.ajax({
-                url: '{{ route('chapter.pages.reorder', $chapter->id) }}',
-                method: 'POST',
+                url: '{{ route('admin.chapters.pages.reorder', $chapter->id) }}',
+                method: 'PUT',
                 data: {
                     _token: '{{ csrf_token() }}',
                     order: ordered
@@ -148,3 +171,4 @@
         });
     });
 </script>
+@endsection

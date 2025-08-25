@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('cover_image')->nullable();
-            $table->enum('status', ['Ongoing', 'Completed'])->default('Ongoing');
+            $table->enum('status', ['Ongoing', 'Completed','Hiatus'])->default('Ongoing');
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
