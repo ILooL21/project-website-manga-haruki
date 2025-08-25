@@ -21,9 +21,9 @@
         </div>
 
         <!-- Manga Pages -->
-        <div id="manga-reader" class="bg-[#1a1625] p-4 rounded-lg shadow-md overflow-y-auto">
+        <div id="manga-reader" class="bg-base-200 p-4 rounded-lg shadow-md overflow-y-auto border border-base-200/40 text-base-content">
             @foreach ($pages as $page)
-                <img src="{{ asset('images/' . $page->image_url) }}" alt="Manga Page" class="w-full mb-4 rounded-lg">
+                <img src="{{ asset('images/' . $page->image_url) }}" alt="Manga Page" class="w-full mb-4 rounded-lg border-4 border-base-200/40">
             @endforeach
         </div>
     </div>

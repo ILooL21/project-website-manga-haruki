@@ -19,7 +19,7 @@
         prev() { this.current = (this.current - 1 + this.mangas.length) % this.mangas.length },
         goTo(idx) { this.current = idx },
     }"
-        class="relative w-full h-[500px] flex items-center justify-center bg-[#1a1625] overflow-hidden rounded-xl mx-auto max-w-7xl mt-4">
+        class="relative w-full h-[500px] flex items-center justify-center bg-base-200 overflow-hidden rounded-xl mx-auto max-w-7xl mt-4">
         <!-- Background Blur -->
         <template x-for="(manga, idx) in mangas" :key="idx">
             <div x-show="current === idx" class="absolute inset-0 w-full h-full z-0">
@@ -30,7 +30,7 @@
         <!-- Carousel Content -->
         <div class="relative z-10 w-full flex items-center justify-between px-8 py-8">
             <!-- Manga Detail -->
-            <div class="w-full md:w-1/2 text-white">
+            <div class="w-full md:w-1/2 text-base-content">
                 <template x-for="(manga, idx) in mangas" :key="idx">
                     <div x-show="current === idx" class="transition-all duration-500">
                         <div class="text-lg font-semibold mb-2">Chapter: <span x-text="manga.chapter"></span></div>
@@ -38,7 +38,7 @@
                         <div class="mb-6 text-lg" x-text="manga.desc"></div>
                         <div class="flex flex-wrap gap-2 mb-8">
                             <template x-for="genre in manga.genres" :key="genre">
-                                <span class="px-4 py-1 rounded-md bg-white/10 border border-white/20 text-sm font-medium"
+                                <span class="px-4 py-1 rounded-md bg-base-100/40 border border-base-200/50 text-sm font-medium text-base-content"
                                     x-text="genre"></span>
                             </template>
                         </div>
@@ -58,7 +58,7 @@
                 <template x-for="(manga, idx) in mangas" :key="idx">
                     <div x-show="current === idx" class="transition-all duration-500">
                         <img :src="'{{ asset('') }}' + manga.img" alt="cover"
-                            class="w-[350px] h-[480px] object-cover rounded-xl shadow-2xl border-4 border-white/20"
+                            class="w-[350px] h-[480px] object-cover rounded-xl shadow-2xl border-4 border-base-200/40"
                             style="transform: skewX(-10deg);">
                     </div>
                 </template>
@@ -67,20 +67,20 @@
         <!-- Indicators -->
         <div class="absolute bottom-8 right-8 flex gap-3 z-20">
             <template x-for="(manga, idx) in mangas" :key="idx">
-                <button @click="goTo(idx)" :class="current === idx ? 'bg-purple-400' : 'bg-white/30'"
+                <button @click="goTo(idx)" :class="current === idx ? 'bg-primary' : 'bg-base-300'"
                     class="w-4 h-4 rounded-full transition"></button>
             </template>
         </div>
         <!-- Controls -->
         <button @click="prev"
-            class="absolute top-1/2 left-6 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/60 rounded-full p-3 focus:outline-none">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            class="absolute top-1/2 left-6 -translate-y-1/2 z-20 bg-base-200/60 hover:bg-base-200 rounded-full p-3 focus:outline-none">
+            <svg class="w-6 h-6 text-base-content" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
         </button>
         <button @click="next"
-            class="absolute top-1/2 right-6 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/60 rounded-full p-3 focus:outline-none">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            class="absolute top-1/2 right-6 -translate-y-1/2 z-20 bg-base-200/60 hover:bg-base-200 rounded-full p-3 focus:outline-none">
+            <svg class="w-6 h-6 text-base-content" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
             </svg>
         </button>
@@ -132,48 +132,48 @@
                     <h2 class="card-title mb-4">Projek Manga yang Dikerjakan</h2>
                     {{-- Projek Komik Section --}}
                     <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-[#1a1625] border border-white/10">
+                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
                             <img src="images/pomu.webp" alt="Mercenary Enrollment"
                                 class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-white">Mercenary
+                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Mercenary
                                 Enrollment</a>
-                            <div class="text-sm text-gray-400 mt-1">Chapter 249</div>
+                            <div class="text-sm text-base-content/60 mt-1">Chapter 249</div>
                             <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Action</span>
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Drama</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Action</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Drama</span>
                             </div>
                         </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-[#1a1625] border border-white/10">
+                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
                             <img src="images/yuji.webp" alt="Sample Manga 2" class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-white">Sample
+                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
                                 Manga 2</a>
-                            <div class="text-sm text-gray-400 mt-1">Chapter 120</div>
+                            <div class="text-sm text-base-content/60 mt-1">Chapter 120</div>
                             <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Romance</span>
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Comedy</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Romance</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Comedy</span>
                             </div>
                         </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-[#1a1625] border border-white/10">
+                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
                             <img src="images/slamdunknew01.webp" alt="Sample Manga 3"
                                 class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-white">Sample
+                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
                                 Manga 3</a>
-                            <div class="text-sm text-gray-400 mt-1">Chapter 87</div>
+                            <div class="text-sm text-base-content/60 mt-1">Chapter 87</div>
                             <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Fantasy</span>
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Adventure</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Fantasy</span>
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Adventure</span>
                             </div>
                         </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-[#1a1625] border border-white/10">
+                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
                             <img src="images/slamdunknew01.webp" alt="Sample Manga 4"
                                 class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-white">Sample
+                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
                                 Manga 4</a>
-                            <div class="text-sm text-gray-400 mt-1">Chapter 45</div>
+                            <div class="text-sm text-base-content/60 mt-1">Chapter 45</div>
                             <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">School
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">School
                                     Life</span>
-                                <span class="px-2 py-0.5 rounded bg-purple-900/30 text-purple-300 text-xs">Slice of
+                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Slice of
                                     Life</span>
                             </div>
                         </div>
