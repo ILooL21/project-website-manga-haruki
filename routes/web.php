@@ -63,6 +63,13 @@ Route::middleware('auth')->group(function () {
         Route::put('admin/genres/{id}', [GenreController::class, 'update'])->name('admin.genres.update');
         Route::delete('admin/genres/{id}', [GenreController::class, 'destroy'])->name('admin.genres.destroy');
 
+        // route admin untuk iklan (ads)
+        Route::get('admin/iklan', [\App\Http\Controllers\IklanController::class, 'index'])->name('admin.iklan');
+        Route::post('admin/iklan', [\App\Http\Controllers\IklanController::class, 'store'])->name('admin.iklan.store');
+        Route::get('admin/iklan/{id}/edit', [\App\Http\Controllers\IklanController::class, 'edit'])->name('admin.iklan.edit');
+        Route::put('admin/iklan/{id}', [\App\Http\Controllers\IklanController::class, 'update'])->name('admin.iklan.update');
+        Route::delete('admin/iklan/{id}', [\App\Http\Controllers\IklanController::class, 'destroy'])->name('admin.iklan.destroy');
+
         // route admin untuk manga
         Route::get('admin/mangas', [MangaController::class, 'index'])->name('admin.mangas');
         Route::post('admin/mangas', [MangaController::class, 'store'])->name('admin.mangas.store');

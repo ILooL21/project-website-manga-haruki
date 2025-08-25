@@ -42,9 +42,9 @@
                         class="group flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium {{ Request::is('manga') ? 'bg-purple-100 text-purple-950' : 'text-zinc-800 hover:bg-purple-100 hover:text-purple-950 active:bg-purple-200/75' }}">
                         <span>Manga</span>
                     </a>
-                    <a href="javascript:void(0)"
-                        class="group flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium {{ Request::is('ads') ? 'bg-purple-100 text-purple-950' : 'text-zinc-800 hover:bg-purple-100 hover:text-purple-950 active:bg-purple-200/75' }}">
-                        <span>Iklan(coming soon)</span>
+                    <a href="{{ route('admin.iklan') }}"
+                        class="group flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium {{ Request::is('admin.iklan') ? 'bg-purple-100 text-purple-950' : 'text-zinc-800 hover:bg-purple-100 hover:text-purple-950 active:bg-purple-200/75' }}">
+                        <span>Iklan</span>
                     </a>
                 </nav>
                 <!-- END Desktop Navigation -->
