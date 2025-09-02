@@ -20,7 +20,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect()->route('landing-page.index')->with([
+            return redirect()->route('admin.dashboard')->with([
                 'status' => 'success',
                 'message' => 'Login successful!'
             ]);

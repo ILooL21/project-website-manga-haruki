@@ -11,13 +11,13 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
@@ -35,19 +35,19 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+-   **[Vehikl](https://vehikl.com/)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[WebReinvent](https://webreinvent.com/)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+-   **[Cyber-Duck](https://cyber-duck.co.uk)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Jump24](https://jump24.co.uk)**
+-   **[Redberry](https://redberry.international/laravel/)**
+-   **[Active Logic](https://activelogic.com)**
+-   **[byte5](https://byte5.de)**
+-   **[OP.GG](https://op.gg)**
 
 ## Contributing
 
@@ -68,57 +68,68 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 Follow these steps to set up the project locally:
 
 1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/ILooL21/project-website-manga-haruki.git
-   cd project-website-manga-haruki
-   ```
+
+    ```bash
+    git clone https://github.com/ILooL21/project-website-manga-haruki.git
+    cd project-website-manga-haruki
+    ```
 
 2. **Install dependencies**:
-   - Install PHP dependencies:
-     ```bash
-     composer install
-     ```
-   - Install Node.js dependencies:
-     ```bash
-     npm install
-     ```
+
+    - Install PHP dependencies:
+        ```bash
+        composer install
+        ```
+    - Install Node.js dependencies:
+        ```bash
+        npm install --legacy-peer-deps
+        ```
 
 3. **Set up environment variables**:
-   - Copy `.env.example` to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Update `.env` with your database and other configuration details.
+
+    - Copy `.env.example` to `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    - Update `.env` with your database and other configuration details.
 
 4. **Generate application key**:
-   ```bash
-   php artisan key:generate
-   ```
+
+    ```bash
+    php artisan key:generate
+    ```
 
 5. **Run migrations**:
-   ```bash
-   php artisan migrate
-   ```
 
-6. **Build assets**:
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    php artisan migrate
+    ```
 
-7. **Start the development server**:
-   ```bash
-   php artisan serve
-   ```
+6. **install cloudinary**:
+    ```bash
+    php artisan cloudinary:install
+    ```
+7. **Build assets**:
 
-8. **Access the application**:
+    ```bash
+    npm run dev
+    ```
+
+8. **Start the development server**:
+
+    ```bash
+    php artisan serve
+    ```
+
+9. **Access the application**:
    Open your browser and navigate to `http://localhost:8000`.
 
 ## Requirements
 
-- PHP >= 8.0
-- Composer
-- Node.js & npm
-- A database (e.g., MySQL, PostgreSQL, SQLite)
+-   PHP >= 8.2
+-   Composer
+-   Node.js & npm >= 18.0
+-   A database (e.g., MySQL, PostgreSQL, SQLite)
 
 ## License
 

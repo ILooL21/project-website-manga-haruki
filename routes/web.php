@@ -94,8 +94,14 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/chapters/{id}/edit', [ChapterController::class, 'edit'])->name('admin.chapters.edit');
         Route::put('admin/chapters/{id}', [ChapterController::class, 'update'])->name('admin.chapters.update');
         Route::delete('admin/chapters/{id}', [ChapterController::class, 'destroy'])->name('admin.chapters.destroy');
+
+        // route untuk halaman chapter
         Route::get('admin/chapters/{id}/pages', [ChapterController::class, 'viewPages'])->name('admin.chapters.pages');
+        Route::post('admin/chapters/{id}/pages', [ChapterController::class, 'storePages'])->name('admin.chapters.pages.store');
+        Route::get('admin/chapters/pages/{id}/edit', [ChapterController::class, 'editPages'])->name('admin.chapters.pages.edit');
+        Route::put('admin/chapters/pages/{id}', [ChapterController::class, 'updatePages'])->name('admin.chapters.pages.update');
         Route::put('admin/chapters/{id}/pages/reorder', [ChapterController::class, 'reorderPages'])->name('admin.chapters.pages.reorder');
+        Route::delete('admin/chapters/pages/{id}', [ChapterController::class, 'deletePages'])->name('admin.chapters.pages.delete');
     });
 
     // route untuk logout

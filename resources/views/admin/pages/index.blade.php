@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.css" />
     <style>
         /* Menyembunyikan elemen dengan x-cloak sampai Alpine.js selesai dimuat */
         [x-cloak] { display: none !important; }
@@ -12,7 +13,7 @@
 
 @section('content')
 
-<div x-data="{ open:false, title:'', description:'', status:'ongoing', genresText:'', reset(){ this.title=''; this.description=''; this.status='ongoing'; this.genresText=''; }, }">
+<div x-data="{ open:false}">
     <!-- Page Heading -->
     <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
         <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">
@@ -26,6 +27,47 @@
     </div>
     <!-- END Page Heading -->
 
+    <!-- Modal Tambah Pages -->
+    <div x-cloak x-show="open" class="fixed inset-0 z-50 flex items-center justify-center" @keydown.escape.window="open=false">
+        <!-- overlay -->
+        <div class="absolute inset-0 bg-black/50" @click="open=false"></div>
+
+        <!-- modal box -->
+        <div class="relative z-10 w-full max-w-md rounded-lg bg-white text-zinc-900 shadow-xl">
+            <!-- header -->
+            <div class="flex items-center justify-between border-b border-zinc-100 px-5 py-3">
+                <h3 class="font-semibold">Tambah Pages</h3>
+                <button type="button" @click="open=false" class="rounded p-1 hover:bg-zinc-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- form -->
+            <form action="{{ route('admin.chapters.pages.store', $chapter->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4 p-5">
+                @csrf
+                <div>
+                    <label for="image" class="mb-1 block text-sm font-medium text-zinc-700">Upload Gambar</label>
+                    <input type="file" id="image" name="images[]" accept="image/*" required multiple
+                        class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"/>
+                    <p class="mt-1 text-xs text-zinc-500">Pilih file gambar untuk halaman baru.</p>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" @click="open=false"
+                            class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">Batal</button>
+                    <button type="submit"
+                            class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- END Modal Tambah Pages -->
+
+
     <!-- Page Section -->
     <div class="container mx-auto p-4 lg:p-8 xl:max-w-7xl">
         <div class="flex flex-col rounded-lg border border-zinc-200 bg-white">
@@ -33,13 +75,25 @@
                 <!-- Toolbar -->
                 <div class="mb-4 flex items-center justify-between">
                     <p class="text-sm text-zinc-500">Tarik ikon di kolom kiri untuk mengatur urutan. Klik "Simpan Urutan" untuk melihat payload yang akan dikirim.</p>
-                    <button id="btnSaveOrder" type="button" class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                            <path fill-rule="evenodd" d="M3.5 10a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zm9.78-2.28a.75.75 0 00-1.06-1.06L9 9.88 7.78 8.66a.75.75 0 10-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.75-3.75z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Simpan Urutan</span>
-                    </button>
+                    <div class="flex gap-2">
+                        <!-- Tombol Tambah -->
+                        <button @click="open=true" type="button" class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            <span>Tambah Pages</span>
+                        </button>
+
+                        <!-- Tombol Simpan Urutan -->
+                        <button id="btnSaveOrder" type="button" class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.5 10a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zm9.78-2.28a.75.75 0 00-1.06-1.06L9 9.88 7.78 8.66a.75.75 0 10-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.75-3.75z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Simpan Urutan</span>
+                        </button>
+                    </div>
                 </div>
+
                 <div id="orderPreview" class="mb-4 hidden rounded-md border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-700"></div>
                 <!-- Responsive Table Container -->
                 <div class="min-w-full overflow-x-auto rounded-sm text-black">
@@ -63,16 +117,27 @@
                                     </td>
                                     <td class="p-3 text-start font-semibold text-zinc-600 page-number-cell">{{ $page->page_number }}</td>
                                     <td class="p-3 text-start">
-                                        <img src="{{ asset('images/' . $page->image_url) }}" alt="Page {{ $page->page_number }}" class="h-auto w-32 rounded">
+                                        <img src="{{ asset('storage/' . $page->image_url) }}" alt="Page {{ $page->page_number }}" class="h-auto w-100 rounded">
                                     </td>
                                     <td class="p-3 text-start">
                                         <div class="flex items-center space-x-2">
-                                            <button type="button" class="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50" title="Edit">
-                                                Edit
+                                            <button class="text-blue-500 hover:text-blue-700 hover:cursor-pointer" title="Edit Genre">
+                                                <a href="{{ route('admin.chapters.pages.edit', $page->id) }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
                                             </button>
-                                            <button type="button" class="rounded border border-red-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50" title="Delete">
-                                                Delete
-                                            </button>
+                                            <form action="{{ route('admin.chapters.pages.delete', $page->id) }}" method="POST" class="inline" title="Delete Page" onsubmit="return confirm('Apakah Anda yakin ingin menghapus halaman ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5  hover:cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M6 3a1 1 0 00-1 1v1H3a1 1 0 000 2h1v9a2 2 0 002 2h8a2 2 0 002-2V7h1a1 1 0 100-2h-2V4a1 1 0 00-1-1H6zm3 4a1 1 0 012 0v6a1 1 0 01-2 0V7zm4 0a1 1 0 012 0v6a1 1 0 01-2 0V7z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -100,8 +165,6 @@
     <!-- jQuery and DataTables JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
-<!-- RowReorder extension -->
-<link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.dataTables.css" />
 <script src="https://cdn.datatables.net/rowreorder/1.5.0/js/dataTables.rowReorder.js"></script>
 <script>
     $(document).ready(function() {

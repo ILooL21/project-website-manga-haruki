@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chapter;
+use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ChapterController extends Controller
 {
@@ -122,5 +124,95 @@ class ChapterController extends Controller
         });
 
         return response()->json(['message' => 'Order updated', 'status' => 'success']);
+    }
+
+    public function storePages(Request $request, $id)
+    {
+        $chapter = Chapter::findOrFail($id);
+
+        $request->validate([
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $files = $request->file('images');
+        if ($files) {
+            DB::transaction(function () use ($files, $chapter) {
+                $maxPageNumber = $chapter->pages()->max('page_number') ?? 0;
+
+                foreach ($files as $index => $file) {
+                    $filename = time() . '_' . $chapter->title . '_' . $file->getClientOriginalName();
+                    $path = $file->storeAs('pages', $filename, 'public');
+
+                    Page::create([
+                        'chapter_id' => $chapter->id,
+                        'page_number' => $maxPageNumber + $index + 1,
+                        'image_url' => $path,
+                    ]);
+                }
+            });
+        }
+
+        return redirect()
+            ->route('admin.chapters.pages', $chapter->id)
+            ->with([
+                'status' => 'success',
+                'message' => 'Pages berhasil ditambahkan.',
+            ]);
+    }
+
+    public function editPages($id)
+    {
+        $page = Page::findOrFail($id);
+        return view('admin.pages.edit', compact('page'));
+    }
+
+    public function updatePages(Request $request, $id)
+    {
+        $page = Page::findOrFail($id);
+
+        $data = $request->validate([
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+        ]);
+
+        // simpan gambar storage public
+        if ($request->hasFile('image')) {
+            // hapus gambar lama jika ada
+            if ($page->image_url) {
+                Storage::disk('public')->delete($page->image_url);
+            }
+
+            // nama file timestamp_$request->title_nama file asli
+            $filename = time() . '_' . $page->chapter->title . '_' . $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('pages', $filename, 'public');
+            $data['image_url'] = $path;
+        }
+
+        $page->update($data);
+
+        return redirect()
+            ->route('admin.chapters.pages', $page->chapter_id)
+            ->with([
+                'status' => 'success',
+                'message' => 'Page berhasil diperbarui.',
+            ]);
+    }
+
+    public function deletePages($id)
+    {
+        $page = Page::findOrFail($id);
+
+        // hapus gambar
+        if ($page->image_url) {
+            Storage::disk('public')->delete($page->image_url);
+        }
+
+        $page->delete();
+
+        return redirect()
+            ->route('admin.chapters.pages', $page->chapter_id)
+            ->with([
+                'status' => 'success',
+                'message' => 'Page berhasil dihapus.',
+            ]);
     }
 }
