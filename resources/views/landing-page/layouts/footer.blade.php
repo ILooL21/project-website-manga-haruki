@@ -1,5 +1,6 @@
-<footer class="footer sm:footer-horizontal bg-neutral text-neutral-content items-center p-4">
-  <aside class="grid-flow-col items-center">
+<footer class="bg-neutral text-neutral-content" style="width:100%;margin:0;box-sizing:border-box;">
+  <div class="w-full max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+  <aside class="grid-flow-col items-center flex items-center gap-3">
     <svg
       width="36"
       height="36"
@@ -13,7 +14,7 @@
     </svg>
     <p>Copyright © {{ date('Y') }} - All right reserved</p>
   </aside>
-  <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
+  <nav class="flex items-center gap-4">
     <a>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -48,4 +49,5 @@
       </svg>
     </a>
   </nav>
+  </div>
 </footer>

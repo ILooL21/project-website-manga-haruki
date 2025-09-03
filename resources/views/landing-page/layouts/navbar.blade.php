@@ -13,14 +13,12 @@
             </label>
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
                 <li><a href="{{ route('landing-page.index') }}">Beranda</a></li>
-                <li><a href="{{ route('landing-page.manga_list') }}">Manga/Manhwa List</a></li>
                 <li><a href="{{ route('landing-page.project_list') }}">Project</a></li>
             </ul>
         </div>
         <!-- Menu untuk layar besar -->
         <ul class="hidden lg:flex menu menu-horizontal">
             <li><a href="{{ route('landing-page.index') }}">Beranda</a></li>
-            <li><a href="{{ route('landing-page.manga_list') }}">Manga/Manhwa List</a></li>
             <li><a href="{{ route('landing-page.project_list') }}">Project</a></li>
         </ul>
         <!-- Tombol Search -->

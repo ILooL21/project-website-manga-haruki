@@ -25,9 +25,13 @@
                         <span class="hidden sm:inline">Berikutnya</span>
                     </a>
                     <button id="fullscreen-btn" class="btn btn-primary w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2" aria-label="Mode Full Screen">
-                        <!-- Fullscreen / expand icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path d="M3 9a1 1 0 011-1h3a1 1 0 110 2H5v2a1 1 0 11-2 0V9zM17 9a1 1 0 00-1-1h-3a1 1 0 100 2h2v2a1 1 0 102 0V9zM3 3a1 1 0 011-1h3a1 1 0 110 2H5v2a1 1 0 11-2 0V3zM17 17a1 1 0 01-1 1h-3a1 1 0 110-2h2v-2a1 1 0 112 0v3z"/>
+                        <!-- Enter fullscreen icon -->
+                        <svg id="fs-enter" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" />
+                        </svg>
+                        <!-- Exit fullscreen icon (hidden by default) -->
+                        <svg id="fs-exit" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 4h4v4M16 20h-4v-4M20 8v4h-4M4 16v-4h4" />
                         </svg>
                         <span class="hidden sm:inline">Fullscreen</span>
                     </button>
@@ -37,7 +41,7 @@
         <!-- Manga Pages -->
         <div id="manga-reader" tabindex="0" class="bg-base-200 p-4 rounded-lg shadow-md overflow-y-auto border border-base-200/40 text-base-content">
             @foreach ($pages as $page)
-                <img src="{{ asset('images/' . $page->image_url) }}" alt="Manga Page" class="w-full mb-4 rounded-lg border-4 border-base-200/40">
+                <img src="{{ asset('storage/' . $page->image_url) }}" alt="Manga Page" class="w-full mb-4 rounded-lg border-4 border-base-200/40">
             @endforeach
         </div>
     </div>
@@ -46,6 +50,8 @@
         // Full Screen Mode
         const fsBtn = document.getElementById('fullscreen-btn');
         const reader = document.getElementById('manga-reader');
+        const fsEnter = document.getElementById('fs-enter');
+        const fsExit = document.getElementById('fs-exit');
 
         function enterFullscreen(el){
             if (el.requestFullscreen) return el.requestFullscreen();
@@ -53,19 +59,34 @@
             if (el.msRequestFullscreen) return el.msRequestFullscreen(); // IE11
             return null;
         }
+        function exitFullscreen(){
+            if (document.exitFullscreen) return document.exitFullscreen();
+            if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+            if (document.msExitFullscreen) return document.msExitFullscreen();
+            return null;
+        }
 
-        fsBtn.addEventListener('click', () => enterFullscreen(reader));
+        fsBtn.addEventListener('click', () => {
+            // toggle fullscreen on reader
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                enterFullscreen(reader).catch(()=>{});
+            } else {
+                exitFullscreen().catch(()=>{});
+            }
+        });
 
-        // When element becomes fullscreen, ensure it fills viewport and is scrollable
+        // Update icon state on fullscreen change
         function onFullScreenChange(){
             const isFs = document.fullscreenElement === reader || document.webkitFullscreenElement === reader || document.msFullscreenElement === reader;
             if(isFs){
-                // focus so wheel/keyboard scrolls the reader
                 reader.focus();
-                // optional: hide body scroll to avoid double scroll on some browsers
                 document.documentElement.style.overflow = 'hidden';
+                fsEnter.classList.add('hidden');
+                fsExit.classList.remove('hidden');
             } else {
                 document.documentElement.style.overflow = '';
+                fsEnter.classList.remove('hidden');
+                fsExit.classList.add('hidden');
             }
         }
 

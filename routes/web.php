@@ -27,7 +27,7 @@ Route::resource('/image-cloudinary', ImageCloudinaryController::class)->names([
 
 // Rute untuk halaman awal
 Route::get('/', [HalamanAwalController::class, 'index'])->name('landing-page.index');
-Route::get('/manga-list', [MangaListController::class, 'index'])->name('landing-page.manga_list');
+Route::get('/projects/recent', [HalamanAwalController::class, 'projectsFragment'])->name('landing-page.projects_fragment');
 Route::get('/project-list', [ProjectListController::class, 'index'])->name('landing-page.project_list');
 Route::get('/manga/{id}', [DetailMangaController::class, 'index'])->name('landing-page.detail_manga');
 Route::get('/manga/{manga_id}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');

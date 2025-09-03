@@ -17,6 +17,13 @@ class Chapter extends Model
         'user_id',
     ];
 
+    /**
+     * Cast attributes to proper types.
+     */
+    protected $casts = [
+        'release_date' => 'datetime',
+    ];
+
     // Relasi: Satu Chapter dimiliki oleh satu Manga
     public function manga()
     {

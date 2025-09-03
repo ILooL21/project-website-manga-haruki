@@ -3,27 +3,18 @@
 @section('title', 'Haruki')
 
 @section('content')
-    <div x-data="{
-        mangas: [{
-                chapter: '249',
-                title: 'Mercenary Enrollment',
-                desc: 'Yu Ijin adalah satu-satunya yang selamat dari kecelakaan pesawat saat dia masih kecil. Setelah menjadi tentara bayaran untuk bertahan hidup selama 10 tahun, ia kembali ke keluarganya di kampung.',
-                genres: ['Action', 'Drama', 'Romance', 'School Life', 'Sci-fi'],
-                img: 'images/pomu.webp',
-                url: '#'
-            },
-            // Tambahkan manga lain di sini
-        ],
+    <div x-data='{
+        mangas: @json($mangas ?? []),
         current: 0,
-        next() { this.current = (this.current + 1) % this.mangas.length },
-        prev() { this.current = (this.current - 1 + this.mangas.length) % this.mangas.length },
+        next() { if(this.mangas.length) this.current = (this.current + 1) % this.mangas.length },
+        prev() { if(this.mangas.length) this.current = (this.current - 1 + this.mangas.length) % this.mangas.length },
         goTo(idx) { this.current = idx },
-    }"
+    }'
         class="relative w-full h-[500px] flex items-center justify-center bg-base-200 overflow-hidden rounded-xl mx-auto max-w-7xl mt-4">
         <!-- Background Blur -->
         <template x-for="(manga, idx) in mangas" :key="idx">
             <div x-show="current === idx" class="absolute inset-0 w-full h-full z-0">
-                <img :src="'{{ asset('') }}' + manga.img" alt="cover"
+                <img :src="manga.img" alt="cover"
                     class="object-cover w-full h-full blur-lg opacity-40">
             </div>
         </template>
@@ -33,8 +24,10 @@
             <div class="w-full md:w-1/2 text-base-content">
                 <template x-for="(manga, idx) in mangas" :key="idx">
                     <div x-show="current === idx" class="transition-all duration-500">
-                        <div class="text-lg font-semibold mb-2">Chapter: <span x-text="manga.chapter"></span></div>
-                        <div class="text-4xl md:text-5xl font-bold mb-4" x-text="manga.title"></div>
+                        <div class="text-lg font-semibold mb-2">Chapter: <span x-text="manga.chapter ?? '-' "></span></div>
+                        <div class="text-4xl md:text-5xl font-bold mb-4">
+                            <a :href="manga.url" class="hover:underline" x-text="manga.title"></a>
+                        </div>
                         <div class="mb-6 text-lg" x-text="manga.desc"></div>
                         <div class="flex flex-wrap gap-2 mb-8">
                             <template x-for="genre in manga.genres" :key="genre">
@@ -47,7 +40,7 @@
                             Mulai Membaca
                             <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
                     </div>
@@ -57,9 +50,11 @@
             <div class="hidden md:flex w-1/2 justify-end items-center">
                 <template x-for="(manga, idx) in mangas" :key="idx">
                     <div x-show="current === idx" class="transition-all duration-500">
-                        <img :src="'{{ asset('') }}' + manga.img" alt="cover"
-                            class="w-[350px] h-[480px] object-cover rounded-xl shadow-2xl border-4 border-base-200/40"
-                            style="transform: skewX(-10deg);">
+                        <a :href="manga.url" class="block transform-gpu">
+                            <img :src="manga.img" alt="cover"
+                                class="w-[350px] h-[480px] object-cover rounded-xl shadow-2xl border-4 border-base-200/40"
+                                style="transform: skewX(-10deg);">
+                        </a>
                     </div>
                 </template>
             </div>
@@ -106,118 +101,96 @@
                     </div> --}}
                 </div>
             </div>
-            <div class="col-span-12 md:col-span-6 lg:col-span-4 card bg-base-100 shadow-sm">
-                <!-- Riwayat Baca Pengguna -->
-                <div class="card-body">
-                    <h2 class="card-title">Riwayat Baca Anda</h2>
-                    <ul class="space-y-4">
-                        <!-- Contoh riwayat, ganti dengan data dinamis jika tersedia -->
-                        <li class="flex items-center gap-3">
-                            <img src="images/pomu.webp" alt="Mercenary Enrollment"
-                                class="w-12 h-16 object-cover rounded shadow">
-                            <div>
-                                <a href="#" class="font-semibold text-base hover:underline">Mercenary Enrollment</a>
-                                <div class="text-sm text-gray-500">Chapter 249 • Terakhir dibaca 2 hari lalu</div>
-                            </div>
-                        </li>
-                        <!-- Tambahkan riwayat lain di sini -->
-                    </ul>
-                    <div class="card-actions justify-end mt-4">
-                        <a href="#" class="btn btn-secondary">Lihat Semua Riwayat</a>
+            <div class="col-span-12 md:col-span-6 lg:col-span-4 space-y-4">
+                <!-- New Releases -->
+                <div class="card bg-base-100 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title">Rilisan Baru</h2>
+                        <ul class="space-y-3">
+                            @foreach($newReleases ?? [] as $r)
+                                <li class="flex items-center gap-3">
+                                    <img src="{{ $r['cover'] }}" alt="{{ $r['title'] }}" class="w-12 h-16 object-cover rounded shadow">
+                                    <div>
+                                        <a href="{{ $r['url'] }}" class="font-semibold hover:underline">{{ $r['title'] }}</a>
+                                        <div class="text-sm text-gray-500">{{ $r['created_human'] ?? '' }}</div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Random Spotlight -->
+                <div class="card bg-base-100 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="card-title">Rekomendasi</h2>
+                        <ul class="space-y-3">
+                            @foreach($spotlight ?? [] as $s)
+                                <li class="flex items-center gap-3">
+                                    <img src="{{ $s['cover'] }}" alt="{{ $s['title'] }}" class="w-12 h-16 object-cover rounded shadow">
+                                    <div>
+                                        <a href="{{ $s['url'] }}" class="font-semibold hover:underline">{{ $s['title'] }}</a>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 md:col-span-8 lg:col-span-8 card bg-base-100 shadow-sm">
+            <div class="col-span-12 md:col-span-12 lg:col-span-12 card bg-base-100 shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title mb-4">Projek Manga yang Dikerjakan</h2>
                     {{-- Projek Komik Section --}}
-                    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
-                            <img src="images/pomu.webp" alt="Mercenary Enrollment"
-                                class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Mercenary
-                                Enrollment</a>
-                            <div class="text-sm text-base-content/60 mt-1">Chapter 249</div>
-                            <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Action</span>
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Drama</span>
-                            </div>
-                        </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
-                            <img src="images/yuji.webp" alt="Sample Manga 2" class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
-                                Manga 2</a>
-                            <div class="text-sm text-base-content/60 mt-1">Chapter 120</div>
-                            <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Romance</span>
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Comedy</span>
-                            </div>
-                        </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
-                            <img src="images/slamdunknew01.webp" alt="Sample Manga 3"
-                                class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
-                                Manga 3</a>
-                            <div class="text-sm text-base-content/60 mt-1">Chapter 87</div>
-                            <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Fantasy</span>
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Adventure</span>
-                            </div>
-                        </div>
-                        <div class="rounded-lg shadow p-4 flex flex-col items-center bg-base-100 border border-base-200">
-                            <img src="images/slamdunknew01.webp" alt="Sample Manga 4"
-                                class="w-24 h-32 object-cover rounded mb-3">
-                            <a href="#" class="font-semibold text-lg hover:underline text-center text-base-content">Sample
-                                Manga 4</a>
-                            <div class="text-sm text-base-content/60 mt-1">Chapter 45</div>
-                            <div class="flex flex-wrap gap-1 mt-2 justify-center">
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">School
-                                    Life</span>
-                                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">Slice of
-                                    Life</span>
-                            </div>
-                        </div>
-                        <!-- Tambahkan projek manga lain di sini -->
-                    </div>
+                    @php
+                        // projek awal yang dirender dari server
+                        $projects = app(\App\Http\Controllers\LandingPage\HalamanAwalController::class)->latestProjects();
+                    @endphp
+
+                    @include('landing-page.partials.projects_grid', ['projects' => $projects])
+
+                    <script>
+                        (function(){
+                            // polling configuration
+                            const url = '{{ route('landing-page.projects_fragment') }}';
+                            let interval = 8000; // 8s
+                            let backoff = 1;
+                            let timer = null;
+
+                            async function fetchAndReplace(){
+                                if (document.hidden) return schedule();
+                                try{
+                                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                                    if (!res.ok) throw new Error('Network response not ok');
+                                    const html = await res.text();
+                                    // parse and extract the fragment
+                                    const tmp = document.createElement('div');
+                                    tmp.innerHTML = html;
+                                    const newGrid = tmp.querySelector('#projects-grid');
+                                    const oldGrid = document.querySelector('#projects-grid');
+                                    if (newGrid && oldGrid && newGrid.innerHTML !== oldGrid.innerHTML){
+                                        oldGrid.innerHTML = newGrid.innerHTML;
+                                    }
+                                    backoff = 1; // reset on success
+                                }catch(e){
+                                    console.error('projects poll error', e);
+                                    backoff = Math.min(backoff * 2, 8); // up to 8x
+                                }
+                                schedule();
+                            }
+
+                            function schedule(){
+                                clearTimeout(timer);
+                                timer = setTimeout(fetchAndReplace, interval * backoff);
+                            }
+
+                            // start
+                            document.addEventListener('visibilitychange', function(){ if(!document.hidden) fetchAndReplace(); });
+                            schedule();
+                        })();
+                    </script>
                 </div>
             </div>
-            <div class="col-span-12 md:col-span-4 lg:col-span-4 card bg-base-100 shadow-sm">
-                <!-- Komik Terpopuler Section -->
-                <div class="card-body">
-                    <h2 class="card-title">Komik Terpopuler</h2>
-                    <ul class="space-y-4">
-                        <!-- Contoh komik populer, ganti dengan data dinamis jika tersedia -->
-                        <li class="flex items-center gap-3">
-                            <img src="images/pomu.webp" alt="Mercenary Enrollment"
-                                class="w-12 h-16 object-cover rounded shadow">
-                            <div>
-                                <a href="#" class="font-semibold text-base hover:underline">Mercenary Enrollment</a>
-                                <div class="text-sm text-gray-500">Chapter 249 • 1.2M views</div>
-                            </div>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <img src="images/slamdunknew01.webp" alt="Sample Manga 2"
-                                class="w-12 h-16 object-cover rounded shadow">
-                            <div>
-                                <a href="#" class="font-semibold text-base hover:underline">Sample Manga 2</a>
-                                <div class="text-sm text-gray-500">Chapter 120 • 950K views</div>
-                            </div>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <img src="images/slamdunknew01.webp" alt="Sample Manga 3"
-                                class="w-12 h-16 object-cover rounded shadow">
-                            <div>
-                                <a href="#" class="font-semibold text-base hover:underline">Sample Manga 3</a>
-                                <div class="text-sm text-gray-500">Chapter 87 • 800K views</div>
-                            </div>
-                        </li>
-                        <!-- Tambahkan komik populer lain di sini -->
-                    </ul>
-                    <div class="card-actions justify-end mt-4">
-                        <a href="#" class="btn btn-secondary">Lihat Semua Komik Populer</a>
-                    </div>
-                </div>
-            </div>
+            <!-- Komik Terpopuler dihapus; ruang digunakan untuk memperluas konten utama -->
             <!-- Tambahkan lebih banyak kartu di sini -->
         </div>
     </div>
