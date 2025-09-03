@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Iklan;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class IklanController extends Controller
 {
@@ -14,11 +14,6 @@ class IklanController extends Controller
         $iklans = Iklan::orderBy('created_at', 'desc')->get();
         return view('admin.iklan.index', compact('iklans'));
     }
-
-    // public function create()
-    // {
-    //     return view('admin.iklan.create');
-    // }
 
     public function store(Request $request)
     {
@@ -29,12 +24,15 @@ class IklanController extends Controller
         ]);
 
         $imageName = time() . '_' . preg_replace('/[^a-z0-9\.\-]/i', '_', $request->file('image')->getClientOriginalName());
-        // store on the public disk (storage/app/public/iklan)
-        Storage::disk('public')->putFileAs('iklan', $request->file('image'), $imageName);
+        $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+            'folder' => 'iklan',
+            'public_id' => pathinfo($imageName, PATHINFO_FILENAME),
+            'resource_type' => 'image'
+        ]);
 
         Iklan::create([
             'section' => $request->section,
-            'image_path' => 'iklan/' . $imageName,
+            'image_path' => $uploaded['public_id'],
             'link' => $request->link,
         ]);
 
@@ -62,12 +60,16 @@ class IklanController extends Controller
 
         if ($request->hasFile('image')) {
             // delete old file on public disk if exists
-            if ($iklan->image_path && Storage::disk('public')->exists($iklan->image_path)) {
-                Storage::disk('public')->delete($iklan->image_path);
+            if ($iklan->image_path) {
+                Cloudinary::uploadApi()->destroy($iklan->image_path);
             }
             $imageName = time() . '_' . preg_replace('/[^a-z0-9\.\-]/i', '_', $request->file('image')->getClientOriginalName());
-            Storage::disk('public')->putFileAs('iklan', $request->file('image'), $imageName);
-            $iklan->image_path = 'iklan/' . $imageName;
+            $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+                'folder' => 'iklan',
+                'public_id' => pathinfo($imageName, PATHINFO_FILENAME),
+                'resource_type' => 'image'
+            ]);
+            $iklan->image_path = $uploaded['public_id'];
         }
 
         $iklan->section = $request->section;
@@ -81,8 +83,8 @@ class IklanController extends Controller
     {
         $id = Crypt::decryptString(urldecode($encodedId));
         $iklan = Iklan::findOrFail($id);
-        if ($iklan->image_path && Storage::disk('public')->exists($iklan->image_path)) {
-            Storage::disk('public')->delete($iklan->image_path);
+        if ($iklan->image_path) {
+            Cloudinary::uploadApi()->destroy($iklan->image_path);
         }
         $iklan->delete();
         return redirect()->route('admin.iklan')->with(['status' => 'success', 'message' => 'Iklan dihapus.']);

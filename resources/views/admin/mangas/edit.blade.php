@@ -23,13 +23,27 @@
                 @csrf
                 @method('PUT')
                 <div>
-                    <label for="cover_image" class="mb-1 block text-sm font-medium text-zinc-700">Cover Image</label>
+                    <label for="cover_image_input" class="mb-1 block text-sm font-medium text-zinc-700">Cover Image</label>
                     <div class="mb-2">
-                        <img src="{{ $mangaData->cover_image ? asset('storage/' . $mangaData->cover_image) : asset('images/placeholder.jpg') }}" alt="Cover Image" id="cover_image_preview"
-                             class="mx-auto h-48 w-auto rounded-lg border border-zinc-300">
+                        {{-- Gambar lama dari Cloudinary --}}
+                        <x-cloudinary::image
+                            public-id="{{ $mangaData->cover_image }}"
+                            alt="Cover Image for {{ $mangaData->title }}"
+                            class="cloudinary_cover_preview h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
+                            fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"
+                        />
+
+                        {{-- Preview upload (awal: hidden) --}}
+                        <img src="" alt="Cover Preview" id="cover_image_preview"
+                            class="hidden h-48 w-auto rounded-lg border border-zinc-300">
                     </div>
-                    <input type="file" id="cover_image" name="cover_image" accept="image/*"
-                            class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 file:mr-4 file:rounded file:border-0 file:bg-purple-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-purple-700 hover:file:bg-purple-100" />
+
+                    <input type="file" id="cover_image_input" name="cover_image" accept="image/*"
+                        class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900
+                                file:mr-4 file:rounded file:border-0 file:bg-purple-50 file:px-3 file:py-2
+                                file:text-sm file:font-semibold file:text-purple-700 hover:file:bg-purple-100" />
+
+
                     <p class="mt-1 text-xs text-zinc-500">
                         Upload cover image baru untuk mengganti yang lama. Biarkan kosong untuk mempertahankan gambar saat ini.
                     </p>
@@ -91,22 +105,27 @@
 @endsection
 
 @section('scripts')
-    <script>
-        // jika ada gambar yang diupload maka gambar akan diubah
-        document.getElementById('cover_image').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    // Find the preview image element and update its src attribute
-                    const preview = document.getElementById('cover_image_preview');
-                    preview.src = e.target.result;
-                };
-                
-                // Read the file as a Data URL which can be used as an image source
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+<script>
+    document.getElementById('cover_image_input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const cloudinaryImg = document.querySelector('.cloudinary_cover_preview');
+        const preview = document.getElementById('cover_image_preview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // tampilkan preview
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+
+                // sembunyikan cloudinary image
+                if (cloudinaryImg) {
+                    cloudinaryImg.classList.add('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection
+

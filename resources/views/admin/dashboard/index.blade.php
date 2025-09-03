@@ -87,24 +87,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($mangas ->isEmpty())
-                                    <tr>
-                                        <td colspan="4" class="p-3 text-center text-sm text-zinc-600">No mangas found.</td>
+                                @foreach ($mangas as $manga)
+                                    <tr class="border-b border-zinc-100 hover:bg-zinc-50">
+                                        <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->title }}</td>
+                                        <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->chapters_count }}</td>
+                                        <td class="p-3 text-start ">
+                                            @foreach ($manga->genres as $genre)
+                                                <span class="inline-block bg-gray-200 text-gray-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded">{{ $genre->name }}</span>
+                                            @endforeach
+                                        </td>
+                                        <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->status }}</td>
                                     </tr>
-                                @else
-                                    @foreach ($mangas as $manga)
-                                        <tr class="border-b border-zinc-100 hover:bg-zinc-50">
-                                            <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->title }}</td>
-                                            <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->chapters_count }}</td>
-                                            <td class="p-3 text-start ">
-                                                @foreach ($manga->genres as $genre)
-                                                    <span class="inline-block bg-gray-200 text-gray-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded">{{ $genre->name }}</span>
-                                                @endforeach
-                                            </td>
-                                            <td class="p-3 text-start font-semibold text-zinc-600">{{ $manga->status }}</td>
-                                        </tr>
-                                    @endforeach
-                                @endif
+                                @endforeach
                             </tbody>
                         </table>
                         <!-- END Manga Table -->

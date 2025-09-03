@@ -62,6 +62,13 @@ class ChapterController extends Controller
     public function destroy($id)
     {
         $chapter = Chapter::findOrFail($id);
+
+        $chapter->pages()->each(function ($page) {
+            Storage::disk('public')->delete($page->image_url);
+        });
+
+        $chapter->pages()->delete();
+
         $chapter->delete();
 
         return redirect()

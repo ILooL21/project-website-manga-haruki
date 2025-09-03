@@ -31,7 +31,7 @@ class ImageCloudinaryController extends Controller
         // upload using Cloudinary facade (storeOnCloudinary is not available on UploadedFile)
         $uploaded = Cloudinary::uploadApi()->upload(
             $file->getRealPath(),
-            ['folder' => 'products'] // tùy chọn folder nếu cần
+            ['folder' => 'products']
         );
 
         Product::create([

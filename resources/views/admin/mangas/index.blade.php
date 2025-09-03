@@ -180,7 +180,7 @@
                                             <form action="{{ route('admin.mangas.destroy', $manga->id) }}" method="POST" class="inline" title="Delete Manga" onsubmit="return confirm('Apakah Anda yakin ingin menghapus genre ini?');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:underline">
+                                                <button type="submit" class="text-red-500 hover:underline hover:cursor-pointer">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                                         viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd"

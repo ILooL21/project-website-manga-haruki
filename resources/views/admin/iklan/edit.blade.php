@@ -25,8 +25,16 @@
             <div>
                 <label class="mb-1 block text-sm font-medium text-zinc-700">Gambar saat ini</label>
                 @if($iklan->image_path)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $iklan->image_path) }}" alt="iklan" class="max-h-36 rounded border" />
+                    <div class="mt-2" id="current_image">
+                        <x-cloudinary::image
+                            public-id="{{ $iklan->image_path }}"
+                            alt="Cover Image for {{ $iklan->title }}"
+                            class="cloudinary_preview h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
+                            fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"
+                        />
+                        {{-- hidden img preview --}}
+                        <img src="" alt="Cover Preview" id="cover_preview"
+                            class="hidden h-48 w-auto rounded-lg border border-zinc-300">
                     </div>
                 @else
                     <div class="mt-2 text-sm text-zinc-500">Belum ada gambar.</div>
@@ -35,8 +43,8 @@
 
             <div>
                 <label for="image" class="mb-1 block text-sm font-medium text-zinc-700">Ganti gambar (opsional)</label>
-          <input type="file" id="image" name="image" accept="image/*" class="file-input file-input-bordered w-full bg-white text-zinc-900"
-              onchange="document.getElementById('file-name').textContent = this.files[0] ? this.files[0].name : 'Belum ada file dipilih'" aria-describedby="file-name" />
+                <input type="file" id="image" name="image" accept="image/*" class="file-input file-input-bordered w-full bg-white text-zinc-900"
+                    oaria-describedby="file-name" />
                 <p id="file-name" class="mt-1 text-sm text-zinc-500">Belum ada file dipilih</p>
             </div>
 
@@ -55,4 +63,30 @@
         </form>
     </div>
 </div>
+@endsection
+@section('scripts')
+<script>
+    document.getElementById('image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const cloudinaryImg = document.querySelector('.cloudinary_preview');
+        const preview = document.getElementById('cover_preview');
+
+        if (file) {
+            document.getElementById('file-name').textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // tampilkan preview
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+
+                // sembunyikan cloudinary image
+                if (cloudinaryImg) {
+                    cloudinaryImg.classList.add('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection

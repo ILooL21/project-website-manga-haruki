@@ -113,7 +113,12 @@
                                         </td>
                                         <td class="p-3 text-start">
                                             @if($iklan->image_path)
-                                                <img src="{{ asset('storage/' . $iklan->image_path) }}" class="h-auto w-32 rounded" alt="iklan">
+                                                <x-cloudinary::image
+                                                    public-id="{{ $iklan->image_path }}"
+                                                    alt="Cover Image for {{ $iklan->section }}"
+                                                    class="h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
+                                                    fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"
+                                                />
                                             @else
                                                 -
                                             @endif
@@ -130,7 +135,7 @@
                                                 </a>
                                             </button>
                                             {{-- Form Hapus dengan Ikon --}}
-                                                        <form action="{{ route('admin.iklan.destroy', urlencode(\Illuminate\Support\Facades\Crypt::encryptString($iklan->id))) }}" method="POST" class="inline" title="Delete Iklan" onsubmit="return confirm('Apakah Anda yakin ingin menghapus iklan ini?');">
+                                            <form action="{{ route('admin.iklan.destroy', urlencode(\Illuminate\Support\Facades\Crypt::encryptString($iklan->id))) }}" method="POST" class="inline" title="Delete Iklan" onsubmit="return confirm('Apakah Anda yakin ingin menghapus iklan ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-500 hover:text-red-700">

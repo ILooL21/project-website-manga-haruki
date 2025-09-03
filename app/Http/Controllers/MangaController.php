@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use App\Models\Manga;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -34,13 +35,17 @@ class MangaController extends Controller
 
         // simpan gambar storage public
         if ($request->hasFile('cover_image')) {
-            // nama file timestamp_$request->title_nama file asli
             $filename = time() . '_' . $request->title . '_' . $request->file('cover_image')->getClientOriginalName();
-            $path = $request->file('cover_image')->storeAs('manga_covers', $filename, 'public');
+            $uploaded = Cloudinary::uploadApi()->upload($request->file('cover_image')->getRealPath(), [
+                'folder' => 'manga_covers',
+                'public_id' => pathinfo($filename, PATHINFO_FILENAME),
+                'resource_type' => 'image'
+            ]);
         }
 
+        $path = $uploaded['public_id'];
+
         try {
-            // mulai transaksi db
             DB::beginTransaction();
 
             Manga::create([
@@ -60,8 +65,8 @@ class MangaController extends Controller
             ]);
         } catch (\Throwable $th) {
             // hapus gambar jika ada
-            if (isset($path)) {
-                Storage::disk('public')->delete($path);
+            if (isset($uploaded)) {
+                Cloudinary::destroy($uploaded['public_id']);
             }
 
             DB::rollBack();
@@ -78,7 +83,9 @@ class MangaController extends Controller
     {
         $mangaData = Manga::findOrFail($id)->load('genres');
         $chapters = $mangaData->chapters()->orderBy('chapter_number', 'desc')->get();
-        $lastChapter = ceil($chapters->first()->chapter_number ?? 0);
+
+        $chapterNumber = $chapters->first()->chapter_number ?? 0;
+        $lastChapter = fmod($chapterNumber, 1) !== 0.0 ? ceil($chapterNumber) : $chapterNumber + 1;
 
         return view('admin.mangas.show', [
             'mangaData' => $mangaData,
@@ -112,9 +119,12 @@ class MangaController extends Controller
 
         // simpan gambar storage public
         if ($request->hasFile('cover_image')) {
-            // nama file timestamp_$request->title_nama file asli
             $filename = time() . '_' . $request->title . '_' . $request->file('cover_image')->getClientOriginalName();
-            $path = $request->file('cover_image')->storeAs('manga_covers', $filename, 'public');
+            $uploaded = Cloudinary::uploadApi()->upload($request->file('cover_image')->getRealPath(), [
+                'folder' => 'manga_covers',
+                'public_id' => pathinfo($filename, PATHINFO_FILENAME),
+                'resource_type' => 'image'
+            ]);
         }
 
         try {
@@ -122,9 +132,11 @@ class MangaController extends Controller
             DB::beginTransaction();
 
             // hapus gambar lama jika ada dan ada upload gambar baru
-            if (isset($path) && $manga->cover_image) {
-                Storage::disk('public')->delete($manga->cover_image);
+            if (isset($uploaded) && $manga->cover_image) {
+                Cloudinary::uploadApi()->destroy($manga->cover_image);
             }
+
+            $path = $uploaded['public_id'];
 
             $manga->update([
                 'title' => $request->title,
@@ -144,8 +156,8 @@ class MangaController extends Controller
             ]);
         } catch (\Throwable $th) {
             // hapus gambar jika ada
-            if (isset($path)) {
-                Storage::disk('public')->delete($path);
+            if (isset($uploaded)) {
+                Cloudinary::uploadApi()->destroy([$uploaded['public_id']], ["invalidate" => true]);
             }
 
             DB::rollBack();
@@ -164,8 +176,17 @@ class MangaController extends Controller
 
         // hapus gambar jika ada
         if ($manga->cover_image) {
-            Storage::disk('public')->delete($manga->cover_image);
+            Cloudinary::uploadApi()->destroy([$manga->cover_image], ["invalidate" => true]);
         }
+
+        $manga->chapters->each(function ($chapter) {
+            $chapter->pages->each(function ($page) {
+                if ($page->image_url) {
+                    Storage::disk('public')->delete($page->image_url);
+                }
+                $page->delete();
+            });
+        });
 
         // hapus manga
         $manga->delete();
