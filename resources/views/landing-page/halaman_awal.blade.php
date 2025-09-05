@@ -87,10 +87,19 @@
                 <!-- Iklan Section -->
                 <div class="flex flex-col items-center justify-center py-8">
                     <span class="text-sm text-gray-500 mb-2">Sponsored</span>
-                    <figure>
-                        <img src="{{ asset('images/iklan.webp') }}" alt="Iklan"
-                            class="rounded-md w-[320px] h-[180px] md:w-[400px] md:h-[220px] lg:w-[480px] lg:h-[260px] shadow-md object-cover" />
-                    </figure>
+                    @if($iklanBanner && ($iklanBanner->image_path ?? null))
+                        <figure>
+                            <a href="{{ $iklanBanner->link ?? '#' }}" target="_blank" rel="noopener noreferrer">
+                                <img src="{{ $iklanBanner->image_path }}" alt="{{ $iklanBanner->section ?? 'Iklan' }}"
+                                    class="rounded-md w-[320px] h-[180px] md:w-[400px] md:h-[220px] lg:w-[480px] lg:h-[260px] shadow-md object-fitr" />
+                            </a>
+                        </figure>
+                    @else
+                        <figure>
+                            <img src="{{ asset('images/iklan.webp') }}" alt="Iklan"
+                                class="rounded-md w-[320px] h-[180px] md:w-[400px] md:h-[220px] lg:w-[480px] lg:h-[260px] shadow-md object-cover" />
+                        </figure>
+                    @endif
                     {{-- <div class="mt-4 text-center">
                         <h2 class="text-lg font-semibold">Iklan Spesial</h2>
                         <p class="text-gray-600">Dapatkan penawaran menarik hanya di sini! Klik gambar untuk info lebih

@@ -22,7 +22,7 @@
             </h1>
             <div class="mb-6 flex justify-center">
                 <x-cloudinary::image
-                    public-id="{{ $mangaData->cover_image }}"
+                    public-id="{{ $mangaData->image_public_id }}"
                     alt="Cover Image for {{ $mangaData->title }}"
                     class="h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
                     fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"

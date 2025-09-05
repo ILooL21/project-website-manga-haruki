@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class MangaController extends Controller
 {
@@ -33,26 +34,28 @@ class MangaController extends Controller
             'genre_ids.*' => 'exists:genres,id',
         ]);
 
-        // simpan gambar storage public
+        // upload cover to Cloudinary (store secure url + public_id)
         if ($request->hasFile('cover_image')) {
-            $filename = time() . '_' . $request->title . '_' . $request->file('cover_image')->getClientOriginalName();
-            $uploaded = Cloudinary::uploadApi()->upload($request->file('cover_image')->getRealPath(), [
+            $file = $request->file('cover_image');
+            $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                 'folder' => 'manga_covers',
-                'public_id' => pathinfo($filename, PATHINFO_FILENAME),
                 'resource_type' => 'image'
             ]);
+            $coverUrl = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+            $coverPublicId = $uploaded['public_id'] ?? null;
         }
-
-        $path = $uploaded['public_id'];
 
         try {
             DB::beginTransaction();
 
+            $slug = $this->generateUniqueSlug($request->title);
+
             Manga::create([
                 'title' => $request->title,
-                'slug' => $request->slug,
+                'slug' => $slug,
                 'description' => $request->description,
-                'cover_image' => $path ?? null,
+                'cover_image' => $coverUrl ?? null,
+                'image_public_id' => $coverPublicId ?? null,
                 'status' => $request->status ?? 'Ongoing',
                 'author_id' => Auth::user()->id
             ])->genres()->sync($request->genre_ids);
@@ -64,9 +67,13 @@ class MangaController extends Controller
                 'message' => 'Manga berhasil ditambahkan.'
             ]);
         } catch (\Throwable $th) {
-            // hapus gambar jika ada
-            if (isset($uploaded)) {
-                Cloudinary::destroy($uploaded['public_id']);
+            // hapus gambar jika ada upload baru saat error
+            if (isset($uploaded) && ! empty($uploaded['public_id'])) {
+                try {
+                    Cloudinary::uploadApi()->destroy($uploaded['public_id'], ["invalidate" => true]);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
 
             DB::rollBack();
@@ -117,32 +124,38 @@ class MangaController extends Controller
             'genre_ids.*' => 'exists:genres,id',
         ]);
 
-        // simpan gambar storage public
+        // upload new cover if provided
         if ($request->hasFile('cover_image')) {
-            $filename = time() . '_' . $request->title . '_' . $request->file('cover_image')->getClientOriginalName();
-            $uploaded = Cloudinary::uploadApi()->upload($request->file('cover_image')->getRealPath(), [
+            $file = $request->file('cover_image');
+            $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                 'folder' => 'manga_covers',
-                'public_id' => pathinfo($filename, PATHINFO_FILENAME),
                 'resource_type' => 'image'
             ]);
+            $newCoverUrl = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+            $newCoverPublicId = $uploaded['public_id'] ?? null;
         }
 
         try {
             // mulai transaksi db
             DB::beginTransaction();
 
-            // hapus gambar lama jika ada dan ada upload gambar baru
-            if (isset($uploaded) && $manga->cover_image) {
-                Cloudinary::uploadApi()->destroy($manga->cover_image);
+            // if new cover uploaded, remove old cloudinary asset by stored public id
+            if (isset($newCoverPublicId) && ! empty($manga->image_public_id)) {
+                try {
+                    Cloudinary::uploadApi()->destroy($manga->image_public_id, ["invalidate" => true]);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
 
-            $path = $uploaded['public_id'];
+            $slug = $this->generateUniqueSlug($request->title, $manga->id);
 
             $manga->update([
                 'title' => $request->title,
-                'slug' => $request->slug,
+                'slug' => $slug,
                 'description' => $request->description,
-                'cover_image' => $path ?? $manga->cover_image,
+                'cover_image' => $newCoverUrl ?? $manga->cover_image,
+                'image_public_id' => $newCoverPublicId ?? $manga->image_public_id,
                 'status' => $request->status ?? 'Ongoing',
             ]);
 
@@ -155,9 +168,13 @@ class MangaController extends Controller
                 'message' => 'Manga berhasil diupdate.'
             ]);
         } catch (\Throwable $th) {
-            // hapus gambar jika ada
-            if (isset($uploaded)) {
-                Cloudinary::uploadApi()->destroy([$uploaded['public_id']], ["invalidate" => true]);
+            // cleanup newly uploaded asset on failure
+            if (isset($newCoverPublicId) && ! empty($newCoverPublicId)) {
+                try {
+                    Cloudinary::uploadApi()->destroy($newCoverPublicId, ["invalidate" => true]);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
 
             DB::rollBack();
@@ -174,9 +191,13 @@ class MangaController extends Controller
     {
         $manga = Manga::findOrFail($id);
 
-        // hapus gambar jika ada
-        if ($manga->cover_image) {
-            Cloudinary::uploadApi()->destroy([$manga->cover_image], ["invalidate" => true]);
+        // hapus remote cloudinary asset jika ada public id tersimpan
+        if (! empty($manga->image_public_id)) {
+            try {
+                Cloudinary::uploadApi()->destroy($manga->image_public_id, ["invalidate" => true]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $manga->chapters->each(function ($chapter) {
@@ -195,5 +216,23 @@ class MangaController extends Controller
             'status' => 'success',
             'message' => 'Manga berhasil dihapus.'
         ]);
+    }
+
+    /**
+     * Generate a unique slug for the manga based on title.
+     * If $excludeId is provided, exclude that record when checking uniqueness (for updates).
+     */
+    private function generateUniqueSlug(string $title, $excludeId = null): string
+    {
+        $base = Str::slug($title ?: 'manga');
+        $slug = $base;
+        $i = 1;
+        while (Manga::where('slug', $slug)->when($excludeId, function($q) use ($excludeId){
+            return $q->where('id', '!=', $excludeId);
+        })->exists()) {
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+        return $slug;
     }
 }

@@ -13,8 +13,10 @@ class Manga extends Model
         'title',
         'description',
         'cover_image',
+        'image_public_id',
         'status',
         'author_id',
+        'slug',
     ];
 
     // Relasi: Satu Manga dimiliki oleh satu User (Author)

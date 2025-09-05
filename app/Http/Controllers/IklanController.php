@@ -23,16 +23,16 @@ class IklanController extends Controller
             'link' => 'nullable|url'
         ]);
 
-        $imageName = time() . '_' . preg_replace('/[^a-z0-9\.\-]/i', '_', $request->file('image')->getClientOriginalName());
-        $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+        $file = $request->file('image');
+        $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
             'folder' => 'iklan',
-            'public_id' => pathinfo($imageName, PATHINFO_FILENAME),
             'resource_type' => 'image'
         ]);
 
         Iklan::create([
             'section' => $request->section,
-            'image_path' => $uploaded['public_id'],
+            'image_path' => $uploaded['secure_url'] ?? ($uploaded['url'] ?? null),
+            'image_public_id' => $uploaded['public_id'] ?? null,
             'link' => $request->link,
         ]);
 
@@ -59,17 +59,23 @@ class IklanController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // delete old file on public disk if exists
-            if ($iklan->image_path) {
-                Cloudinary::uploadApi()->destroy($iklan->image_path);
+            // delete old remote image if exists
+            if (! empty($iklan->image_public_id)) {
+                try {
+                    Cloudinary::uploadApi()->destroy($iklan->image_public_id, ["invalidate" => true]);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
             }
-            $imageName = time() . '_' . preg_replace('/[^a-z0-9\.\-]/i', '_', $request->file('image')->getClientOriginalName());
-            $uploaded = Cloudinary::uploadApi()->upload($request->file('image')->getRealPath(), [
+
+            $file = $request->file('image');
+            $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                 'folder' => 'iklan',
-                'public_id' => pathinfo($imageName, PATHINFO_FILENAME),
                 'resource_type' => 'image'
             ]);
-            $iklan->image_path = $uploaded['public_id'];
+
+            $iklan->image_path = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+            $iklan->image_public_id = $uploaded['public_id'] ?? null;
         }
 
         $iklan->section = $request->section;
@@ -83,8 +89,12 @@ class IklanController extends Controller
     {
         $id = Crypt::decryptString(urldecode($encodedId));
         $iklan = Iklan::findOrFail($id);
-        if ($iklan->image_path) {
-            Cloudinary::uploadApi()->destroy($iklan->image_path);
+        if (! empty($iklan->image_public_id)) {
+            try {
+                Cloudinary::uploadApi()->destroy($iklan->image_public_id, ["invalidate" => true]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
         $iklan->delete();
         return redirect()->route('admin.iklan')->with(['status' => 'success', 'message' => 'Iklan dihapus.']);

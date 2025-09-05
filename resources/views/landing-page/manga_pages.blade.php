@@ -6,7 +6,7 @@
     <div class="container mx-auto px-4 my-12">
         <!-- Navigation Bar -->
         <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-6 gap-3">
-            <a href="{{ route('landing-page.manga_list') }}" class="btn btn-outline w-full md:w-auto">Kembali ke Halaman Awal</a>
+            <a href="{{ route('landing-page.index') }}" class="btn btn-outline w-full md:w-auto">Kembali ke Halaman Awal</a>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                     <a href="{{ $previousChapter ? route('landing-page.manga_pages', ['manga_id' => $manga->id, 'chapter_number' => $previousChapter]) : '#' }}"
                         class="btn btn-outline w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2" @if (!$previousChapter) disabled @endif aria-label="Chapter Sebelumnya">

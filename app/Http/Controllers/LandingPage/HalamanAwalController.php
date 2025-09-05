@@ -5,6 +5,7 @@ namespace App\Http\Controllers\LandingPage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Manga;
+use App\Models\Iklan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,21 +14,21 @@ class HalamanAwalController extends Controller
     public function index()
     {
         // load recent mangas with genres and chapters and map to a lightweight array for the hero
-        $mangas = Manga::with(['genres', 'chapters'])->orderBy('created_at', 'desc')->take(6)->get()->map(function($m) {
+        $mangas = Manga::with(['genres', 'chapters'])->orderBy('created_at', 'desc')->take(6)->get()->map(function ($m) {
             return [
                 'id' => $m->id,
                 'title' => $m->title,
                 'desc' => Str::limit($m->description ?? '', 260),
                 'genres' => $m->genres->pluck('name'),
-                // cover_image may be stored as public path like 'images/..' or storage path; prefer absolute asset
-                'img' => $m->cover_image ? asset('storage/' . $m->cover_image) : asset('images/pomu.webp'),
+                // cover_image may be Cloudinary public_id, storage path or absolute URL
+                'img' => $this->resolveCover($m->cover_image),
                 'url' => route('landing-page.detail_manga', ['id' => $m->id]),
                 'chapter' => $m->chapters->max('chapter_number') ?? null,
             ];
         });
 
         // New releases (most recently created)
-        $newReleases = Manga::orderBy('created_at', 'desc')->take(6)->get()->map(function($m){
+        $newReleases = Manga::orderBy('created_at', 'desc')->take(6)->get()->map(function ($m) {
             return [
                 'id' => $m->id,
                 'title' => $m->title,
@@ -38,7 +39,7 @@ class HalamanAwalController extends Controller
         });
 
         // Random spotlight (small curated/random set)
-        $spotlight = Manga::inRandomOrder()->take(4)->get()->map(function($m){
+        $spotlight = Manga::inRandomOrder()->take(4)->get()->map(function ($m) {
             return [
                 'id' => $m->id,
                 'title' => $m->title,
@@ -47,7 +48,9 @@ class HalamanAwalController extends Controller
             ];
         });
 
-        return view('landing-page.halaman_awal', compact('mangas', 'newReleases', 'spotlight'));
+        $iklanBanner = Iklan::orderBy('created_at', 'desc')->first();
+
+        return view('landing-page.halaman_awal', compact('mangas', 'newReleases', 'spotlight', 'iklanBanner'));
     }
 
     /**
@@ -67,11 +70,13 @@ class HalamanAwalController extends Controller
     public function latestProjects($limit = 8)
     {
         // load mangas with the latest chapter information
-        $mangas = Manga::with(['chapters' => function($q){ $q->orderBy('chapter_number', 'desc'); }])->get();
+        $mangas = Manga::with(['chapters' => function ($q) {
+            $q->orderBy('chapter_number', 'desc');
+        }])->get();
 
-        $mapped = $mangas->map(function($m){
+        $mapped = $mangas->map(function ($m) {
             // take top 3 chapters ordered by chapter_number desc
-            $chapters = $m->chapters->sortByDesc('chapter_number')->take(3)->map(function($c) use ($m){
+            $chapters = $m->chapters->sortByDesc('chapter_number')->take(3)->map(function ($c) use ($m) {
                 return [
                     'chapter_number' => $c->chapter_number,
                     'title' => $c->title,
@@ -112,6 +117,20 @@ class HalamanAwalController extends Controller
         if (file_exists(public_path($img))) return asset($img);
         if (file_exists(public_path('images/' . $img))) return asset('images/' . $img);
         if (file_exists(public_path('storage/' . $img))) return asset('storage/' . $img);
+        // Try Cloudinary (public id stored in DB)
+        try {
+            $cloud = app(\Cloudinary\Cloudinary::class);
+            if ($cloud && is_string($img) && strlen($img) > 0) {
+                // image(...) returns an object with toUrl()
+                $image = $cloud->image($img);
+                if (method_exists($image, 'toUrl')) {
+                    return (string) $image->toUrl();
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore and fallback
+        }
+
         return $fallback;
     }
 }

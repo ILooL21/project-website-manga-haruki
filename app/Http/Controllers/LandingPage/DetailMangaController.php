@@ -21,41 +21,7 @@ class DetailMangaController extends Controller
         // load manga with relations
         $manga = Manga::with(['genres', 'chapters', 'author'])->findOrFail($id);
 
-        // compute cover URL robustly (supports full URLs, storage/public, public/images, or public assets)
-        $img = $manga->cover_image;
-        $coverUrl = asset('images/pomu.webp'); // default fallback
-
-        if ($img) {
-            // absolute URL stored in DB
-            if (Str::startsWith($img, ['http://', 'https://'])) {
-                $coverUrl = $img;
-            }
-
-            // storage disk (public) - e.g. 'mascot.jpg' or 'covers/mascot.jpg'
-            elseif (Storage::disk('public')->exists($img)) {
-                $coverUrl = Storage::url($img);
-            }
-
-            // common variants: stored as filename in 'images/' folder on public
-            elseif (Storage::disk('public')->exists('images/' . $img)) {
-                $coverUrl = Storage::url('images/' . $img);
-            }
-
-            // public path exact
-            elseif (file_exists(public_path($img))) {
-                $coverUrl = asset($img);
-            }
-
-            // public/images/filename.jpg
-            elseif (file_exists(public_path('images/' . $img))) {
-                $coverUrl = asset('images/' . $img);
-            }
-
-            // storage link under public/storage/...
-            elseif (file_exists(public_path('storage/' . $img))) {
-                $coverUrl = asset('storage/' . $img);
-            }
-        }
+    $coverUrl = $this->resolveCover($manga->cover_image);
 
     // paginate chapters for the detail page (15 per page)
     $chapters = $manga->chapters()->orderBy('chapter_number', 'desc')->paginate(15);
@@ -65,5 +31,36 @@ class DetailMangaController extends Controller
     $firstChapterNumber = $firstChapter ? $firstChapter->chapter_number : 1;
 
         return view('landing-page.manga_detail', compact('manga', 'coverUrl', 'chapters', 'firstChapterNumber'));
+    }
+
+    /**
+     * Resolve a cover image value to a usable URL.
+     */
+    private function resolveCover($img)
+    {
+        $fallback = asset('images/pomu.webp');
+        if (!$img) return $fallback;
+
+        if (Str::startsWith($img, ['http://', 'https://'])) return $img;
+        if (Storage::disk('public')->exists($img)) return Storage::url($img);
+        if (Storage::disk('public')->exists('images/' . $img)) return Storage::url('images/' . $img);
+        if (file_exists(public_path($img))) return asset($img);
+        if (file_exists(public_path('images/' . $img))) return asset('images/' . $img);
+        if (file_exists(public_path('storage/' . $img))) return asset('storage/' . $img);
+
+        // Try Cloudinary
+        try {
+            $cloud = app(\Cloudinary\Cloudinary::class);
+            if ($cloud && is_string($img) && strlen($img) > 0) {
+                $image = $cloud->image($img);
+                if (method_exists($image, 'toUrl')) {
+                    return (string) $image->toUrl();
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore and fallback
+        }
+
+        return $fallback;
     }
 }

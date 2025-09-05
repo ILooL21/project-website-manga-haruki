@@ -9,5 +9,5 @@ class Iklan extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['section', 'image_path', 'link'];
+    protected $fillable = ['section', 'image_path', 'image_public_id', 'link'];
 }
