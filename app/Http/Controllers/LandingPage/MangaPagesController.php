@@ -10,13 +10,13 @@ use Illuminate\Http\Request;
 class MangaPagesController extends Controller
 {
     // Ini buat contoh kedepannya
-    public function show($manga_id, $chapter_number)
+    public function show($slug, $chapter_number)
     {
-        // Ambil manga berdasarkan ID
-        $manga = Manga::findOrFail($manga_id);
+        // Ambil manga berdasarkan slug
+        $manga = Manga::where('slug', $slug)->firstOrFail();
 
         // Ambil chapter berdasarkan nomor chapter dan manga_id
-        $chapter = Chapter::where('manga_id', $manga_id)
+        $chapter = Chapter::where('manga_id', $manga->id)
             ->where('chapter_number', $chapter_number)
             ->firstOrFail();
 
@@ -24,12 +24,12 @@ class MangaPagesController extends Controller
         $pages = $chapter->pages;
 
         // Navigasi chapter
-        $previousChapter = Chapter::where('manga_id', $manga_id)
+        $previousChapter = Chapter::where('manga_id', $manga->id)
             ->where('chapter_number', '<', $chapter_number)
             ->orderBy('chapter_number', 'desc')
             ->first();
 
-        $nextChapter = Chapter::where('manga_id', $manga_id)
+        $nextChapter = Chapter::where('manga_id', $manga->id)
             ->where('chapter_number', '>', $chapter_number)
             ->orderBy('chapter_number', 'asc')
             ->first();

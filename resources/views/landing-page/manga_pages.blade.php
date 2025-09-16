@@ -8,7 +8,7 @@
         <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-6 gap-3">
             <a href="{{ route('landing-page.index') }}" class="btn btn-outline w-full md:w-auto">Kembali ke Halaman Awal</a>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-                    <a href="{{ $previousChapter ? route('landing-page.manga_pages', ['manga_id' => $manga->id, 'chapter_number' => $previousChapter]) : '#' }}"
+                    <a href="{{ $previousChapter ? route('landing-page.manga_pages', ['slug' => $manga->slug, 'chapter_number' => $previousChapter]) : '#' }}"
                         class="btn btn-outline w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2" @if (!$previousChapter) disabled @endif aria-label="Chapter Sebelumnya">
                         <!-- Left chevron icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -16,7 +16,7 @@
                         </svg>
                         <span class="hidden sm:inline">Sebelumnya</span>
                     </a>
-                    <a href="{{ route('landing-page.manga_pages', ['manga_id' => $manga->id, 'chapter_number' => $nextChapter]) }}"
+                    <a href="{{ $nextChapter ? route('landing-page.manga_pages', ['slug' => $manga->slug, 'chapter_number' => $nextChapter]) : '#' }}"
                         class="btn btn-outline w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2" @if (!$nextChapter) disabled @endif aria-label="Chapter Berikutnya">
                         <!-- Right chevron icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class MangaController extends Controller
 {
@@ -32,6 +33,7 @@ class MangaController extends Controller
             'status' => 'required|in:Ongoing,Completed,Hiatus',
             'genre_ids' => 'required|array',
             'genre_ids.*' => 'exists:genres,id',
+            'author_name' => 'nullable|string|max:255',
         ]);
 
         // upload cover to Cloudinary (store secure url + public_id)
@@ -57,7 +59,7 @@ class MangaController extends Controller
                 'cover_image' => $coverUrl ?? null,
                 'image_public_id' => $coverPublicId ?? null,
                 'status' => $request->status ?? 'Ongoing',
-                'author_id' => Auth::user()->id
+                'author_name' => $request->author_name ?? null
             ])->genres()->sync($request->genre_ids);
 
             DB::commit();
@@ -67,6 +69,19 @@ class MangaController extends Controller
                 'message' => 'Manga berhasil ditambahkan.'
             ]);
         } catch (\Throwable $th) {
+            // Log full error and context for debugging
+            try {
+                Log::error('Failed to store Manga', [
+                    'exception_message' => $th->getMessage(),
+                    'exception_trace' => $th->getTraceAsString(),
+                    'request' => $request->only(['title', 'description', 'status', 'author_name', 'genre_ids']),
+                    'uploaded' => isset($uploaded) ? $uploaded : null,
+                ]);
+            } catch (\Throwable $logEx) {
+                // if logging fails, still continue to cleanup and rollback
+                report($logEx);
+            }
+
             // hapus gambar jika ada upload baru saat error
             if (isset($uploaded) && ! empty($uploaded['public_id'])) {
                 try {
@@ -77,7 +92,6 @@ class MangaController extends Controller
             }
 
             DB::rollBack();
-            // Handle error
 
             return redirect()->route('admin.mangas')->with([
                 'status' => 'failed',
@@ -156,6 +170,7 @@ class MangaController extends Controller
                 'description' => $request->description,
                 'cover_image' => $newCoverUrl ?? $manga->cover_image,
                 'image_public_id' => $newCoverPublicId ?? $manga->image_public_id,
+                'author_name' => $request->author_name ?? $manga->author_name ?? Auth::user()->name ?? null,
                 'status' => $request->status ?? 'Ongoing',
             ]);
 

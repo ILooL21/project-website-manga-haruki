@@ -51,12 +51,6 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
-    // Relasi: Satu User (sebagai author) bisa punya banyak Manga
-    public function mangas()
-    {
-        return $this->hasMany(Manga::class, 'author_id');
-    }
-
     // Relasi: Satu User (yang mengupload) bisa punya banyak Chapter
     public function chapters()
     {

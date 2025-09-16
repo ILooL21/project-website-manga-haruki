@@ -29,8 +29,8 @@ Route::resource('/image-cloudinary', ImageCloudinaryController::class)->names([
 Route::get('/', [HalamanAwalController::class, 'index'])->name('landing-page.index');
 Route::get('/projects/recent', [HalamanAwalController::class, 'projectsFragment'])->name('landing-page.projects_fragment');
 Route::get('/project-list', [ProjectListController::class, 'index'])->name('landing-page.project_list');
-Route::get('/manga/{id}', [DetailMangaController::class, 'index'])->name('landing-page.detail_manga');
-Route::get('/manga/{manga_id}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');
+Route::get('/manga/{slug}', [DetailMangaController::class, 'index'])->name('landing-page.detail_manga');
+Route::get('/manga/{slug}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');
 Route::get('/manga-dummy/chapter/{chapter}', [MangaPagesController::class, 'indexDummy'])->name('landing-page.manga_pages_dummy');
 
 // Rute untuk pengguna yang belum terautentikasi.

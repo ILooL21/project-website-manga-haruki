@@ -16,10 +16,11 @@ class DetailMangaController extends Controller
      * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request, $id)
+
+    public function index(Request $request, $slug)
     {
-        // load manga with relations
-        $manga = Manga::with(['genres', 'chapters', 'author'])->findOrFail($id);
+        // load manga with relations by slug
+        $manga = Manga::with(['genres', 'chapters'])->where('slug', $slug)->firstOrFail();
 
     $coverUrl = $this->resolveCover($manga->cover_image);
 

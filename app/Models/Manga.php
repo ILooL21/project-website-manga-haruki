@@ -15,15 +15,10 @@ class Manga extends Model
         'cover_image',
         'image_public_id',
         'status',
-        'author_id',
+        'author_name',
         'slug',
     ];
 
-    // Relasi: Satu Manga dimiliki oleh satu User (Author)
-    public function author()
-    {
-        return $this->belongsTo(User::class, 'author_id');
-    }
 
     // Relasi: Satu Manga bisa punya banyak Chapter
     public function chapters()

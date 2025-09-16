@@ -26,7 +26,7 @@
                     <span>Status: <span class="text-base-content">{{ $manga->status ?? 'Unknown' }}</span></span>
                 </div>
                 <div class="flex gap-4">
-                    <a href="{{ route('landing-page.manga_pages', ['manga_id' => $manga->id, 'chapter_number' => $firstChapterNumber ?? ($chapters->first()->chapter_number ?? 1)]) }}"
+                    <a href="{{ route('landing-page.manga_pages', ['slug' => $manga->slug, 'chapter_number' => $firstChapterNumber ?? (optional($chapters->first())->chapter_number ?? 1)]) }}"
                         class="btn btn-primary">Baca</a>
                     {{-- <button class="btn btn-outline">Bookmark</button>
                     <button class="btn btn-outline">Tambah ke Read List</button> --}}
@@ -40,7 +40,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <!-- Chapter list -->
                 @forelse($chapters as $chapter)
-                    <a href="{{ route('landing-page.manga_pages', ['manga_id' => $manga->id, 'chapter_number' => $chapter->chapter_number]) }}"
+                    <a href="{{ route('landing-page.manga_pages', ['slug' => $manga->slug, 'chapter_number' => $chapter->chapter_number]) }}"
                         class="block bg-base-200 p-4 rounded-lg shadow-md hover:bg-primary/10"
                         aria-label="Buka Chapter {{ $chapter->chapter_number }}">
                         <h3 class="text-lg font-semibold text-base-content">Chapter {{ $chapter->chapter_number }} -

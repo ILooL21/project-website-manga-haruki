@@ -22,7 +22,7 @@ class HalamanAwalController extends Controller
                 'genres' => $m->genres->pluck('name'),
                 // cover_image may be Cloudinary public_id, storage path or absolute URL
                 'img' => $this->resolveCover($m->cover_image),
-                'url' => route('landing-page.detail_manga', ['id' => $m->id]),
+                'url' => route('landing-page.detail_manga', ['slug' => $m->slug]),
                 'chapter' => $m->chapters->max('chapter_number') ?? null,
             ];
         });
@@ -33,7 +33,7 @@ class HalamanAwalController extends Controller
                 'id' => $m->id,
                 'title' => $m->title,
                 'cover' => $this->resolveCover($m->cover_image),
-                'url' => route('landing-page.detail_manga', ['id' => $m->id]),
+                'url' => route('landing-page.detail_manga', ['slug' => $m->slug]),
                 'created_human' => optional($m->created_at)->diffForHumans(),
             ];
         });
@@ -44,7 +44,7 @@ class HalamanAwalController extends Controller
                 'id' => $m->id,
                 'title' => $m->title,
                 'cover' => $this->resolveCover($m->cover_image),
-                'url' => route('landing-page.detail_manga', ['id' => $m->id]),
+                'url' => route('landing-page.detail_manga', ['slug' => $m->slug]),
             ];
         });
 
@@ -76,11 +76,11 @@ class HalamanAwalController extends Controller
 
         $mapped = $mangas->map(function ($m) {
             // take top 3 chapters ordered by chapter_number desc
-            $chapters = $m->chapters->sortByDesc('chapter_number')->take(3)->map(function ($c) use ($m) {
+                $chapters = $m->chapters->sortByDesc('chapter_number')->take(3)->map(function ($c) use ($m) {
                 return [
                     'chapter_number' => $c->chapter_number,
                     'title' => $c->title,
-                    'url' => route('landing-page.manga_pages', ['manga_id' => $m->id, 'chapter_number' => $c->chapter_number]),
+                    'url' => route('landing-page.manga_pages', ['slug' => $m->slug, 'chapter_number' => $c->chapter_number]),
                     'created_at' => $c->created_at,
                 ];
             })->values();
@@ -93,7 +93,7 @@ class HalamanAwalController extends Controller
                 'cover' => $this->resolveCover($m->cover_image),
                 'latest_chapter' => $latestChapter ? $latestChapter['chapter_number'] : null,
                 'latest_at' => $latestChapter ? $latestChapter['created_at'] : $m->created_at,
-                'url' => route('landing-page.detail_manga', ['id' => $m->id]),
+                'url' => route('landing-page.detail_manga', ['slug' => $m->slug]),
                 'chapters' => $chapters,
             ];
         });
