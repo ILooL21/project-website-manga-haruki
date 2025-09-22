@@ -13,6 +13,7 @@ class Page extends Model
         'chapter_id',
         'page_number',
         'image_url',
+        'image_public_id',
     ];
 
     // Relasi: Satu Page dimiliki oleh satu Chapter

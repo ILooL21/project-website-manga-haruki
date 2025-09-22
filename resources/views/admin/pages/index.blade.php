@@ -117,7 +117,12 @@
                                     </td>
                                     <td class="p-3 text-start font-semibold text-zinc-600 page-number-cell">{{ $page->page_number }}</td>
                                     <td class="p-3 text-start">
-                                        <img src="{{ asset('storage/' . $page->image_url) }}" alt="Page {{ $page->page_number }}" class="h-auto w-100 rounded">
+                                        <x-cloudinary::image
+                                            public-id="{{ $page->image_public_id }}"
+                                            alt="Cover Image for page {{ $page->page_number }}"
+                                            class="cloudinary_cover_preview h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
+                                            fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"
+                                        />
                                     </td>
                                     <td class="p-3 text-start">
                                         <div class="flex items-center space-x-2">

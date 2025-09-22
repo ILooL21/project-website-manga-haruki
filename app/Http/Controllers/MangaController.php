@@ -8,7 +8,6 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
@@ -217,8 +216,8 @@ class MangaController extends Controller
 
         $manga->chapters->each(function ($chapter) {
             $chapter->pages->each(function ($page) {
-                if ($page->image_url) {
-                    Storage::disk('public')->delete($page->image_url);
+                if ($page->image_public_id) {
+                    Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
                 }
                 $page->delete();
             });
@@ -242,7 +241,7 @@ class MangaController extends Controller
         $base = Str::slug($title ?: 'manga');
         $slug = $base;
         $i = 1;
-        while (Manga::where('slug', $slug)->when($excludeId, function($q) use ($excludeId){
+        while (Manga::where('slug', $slug)->when($excludeId, function ($q) use ($excludeId) {
             return $q->where('id', '!=', $excludeId);
         })->exists()) {
             $slug = $base . '-' . $i;

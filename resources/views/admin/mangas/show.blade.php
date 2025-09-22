@@ -111,7 +111,8 @@
                             </div>
                             <div>
                                 <label for="release_date" class="mb-1 block text-sm font-medium text-zinc-700">Tanggal Rilis</label>
-                                <input type="date" id="release_date" name="release_date"
+                                {{-- default hari ini --}}
+                                <input type="date" id="release_date" name="release_date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"   
                                     class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                                 <p class="mt-1 text-xs text-zinc-500">Gunakan input tanggal bawaan browser (format dapat berbeda per perangkat).</p>
                             </div>
@@ -150,7 +151,7 @@
                                             <td class="p-3 text-start font-semibold text-zinc-600">{{ $loop->iteration }}</td>
                                             <td class="p-3 text-start font-semibold text-zinc-600">{{ $chapter->chapter_number }}</td>
                                             <td class="p-3 text-start font-semibold text-zinc-600">{{ $chapter->title }}</td>
-                                            <td class="p-3 text-start text-zinc-600">{{ $chapter->release_date }}</td>
+                                            <td class="p-3 text-start text-zinc-600">{{ \Carbon\Carbon::parse($chapter->release_date)->translatedFormat('d-M-Y') }}</td>
                                             <td class="p-3 text-start">
                                                 <div class="flex items-center space-x-2">
                                                     <a href="{{ route('admin.chapters.edit', $chapter->id) }}" class="text-blue-500 hover:underline" title="Edit Chapter">

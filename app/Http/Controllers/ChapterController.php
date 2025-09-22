@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Chapter;
 use App\Models\Page;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ChapterController extends Controller
 {
@@ -64,7 +64,9 @@ class ChapterController extends Controller
         $chapter = Chapter::findOrFail($id);
 
         $chapter->pages()->each(function ($page) {
-            Storage::disk('public')->delete($page->image_url);
+            if ($page->image_public_id) {
+                Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
+            }
         });
 
         $chapter->pages()->delete();
@@ -147,13 +149,18 @@ class ChapterController extends Controller
                 $maxPageNumber = $chapter->pages()->max('page_number') ?? 0;
 
                 foreach ($files as $index => $file) {
-                    $filename = time() . '_' . $chapter->title . '_' . $file->getClientOriginalName();
-                    $path = $file->storeAs('pages', $filename, 'public');
+                    $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        'folder' => 'pages',
+                        'resource_type' => 'image',
+                    ]);
+                    $pagesUrl = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+                    $coverPublicId = $uploaded['public_id'] ?? null;
 
                     Page::create([
                         'chapter_id' => $chapter->id,
                         'page_number' => $maxPageNumber + $index + 1,
-                        'image_url' => $path,
+                        'image_url' => $pagesUrl,
+                        'image_public_id' => $coverPublicId,
                     ]);
                 }
             });
@@ -181,27 +188,44 @@ class ChapterController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
         ]);
 
-        // simpan gambar storage public
+        // simpan gambar
         if ($request->hasFile('image')) {
-            // hapus gambar lama jika ada
-            if ($page->image_url) {
-                Storage::disk('public')->delete($page->image_url);
-            }
-
-            // nama file timestamp_$request->title_nama file asli
-            $filename = time() . '_' . $page->chapter->title . '_' . $request->file('image')->getClientOriginalName();
-            $path = $request->file('image')->storeAs('pages', $filename, 'public');
-            $data['image_url'] = $path;
+            $file = $request->file('image');
+            $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                'folder' => 'pages',
+                'resource_type' => 'image',
+            ]);
+            $data['image_url'] = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+            $data['image_public_id'] = $uploaded['public_id'] ?? null;
         }
 
-        $page->update($data);
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('admin.chapters.pages', $page->chapter_id)
-            ->with([
-                'status' => 'success',
-                'message' => 'Page berhasil diperbarui.',
-            ]);
+            // hapus gambar lama
+            if ($request->hasFile('image') && $page->image_public_id) {
+                Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
+            }
+
+            $page->update($data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.chapters.pages', $page->chapter_id)
+                ->with([
+                    'status' => 'success',
+                    'message' => 'Page berhasil diperbarui.',
+                ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->route('admin.chapters.pages', $page->chapter_id)
+                ->with([
+                    'status' => 'error',
+                    'message' => 'Terjadi kesalahan saat memperbarui page: ' . $e->getMessage(),
+                ]);
+        }
     }
 
     public function deletePages($id)
@@ -209,8 +233,8 @@ class ChapterController extends Controller
         $page = Page::findOrFail($id);
 
         // hapus gambar
-        if ($page->image_url) {
-            Storage::disk('public')->delete($page->image_url);
+        if ($page->image_public_id) {
+            Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
         }
 
         $page->delete();

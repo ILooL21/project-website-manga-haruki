@@ -6,7 +6,7 @@
 <div x-data="{ 
     title: '{{ $chapter->title }}', 
     chapter_number: '{{ $chapter->chapter_number }}',
-    release_date: '{{ $chapter->release_date }}'
+    release_date: '{{ $chapter->release_date ? $chapter->release_date->format('Y-m-d') : "" }}',
 }">
     <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
         <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">

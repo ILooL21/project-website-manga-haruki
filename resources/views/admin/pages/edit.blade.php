@@ -21,13 +21,21 @@
             <!-- Preview Gambar -->
             <div>
                 <label class="mb-1 block text-sm font-medium text-zinc-700">Gambar Saat Ini</label>
-                <img :src="preview" alt="Page {{ $page->page_number }}" class="w-40 rounded border">
+                <img :src="preview" alt="Cover Preview" id="cover_image_preview"
+                     class="mb-2 h-auto w-full max-w-xs rounded-lg border border-zinc-300 object-cover shadow-lg hidden"
+                     x-show="preview" />
+                <x-cloudinary::image
+                    public-id="{{ $page->image_public_id }}"
+                    alt="Cover Image for page {{ $page->page_number }}"
+                    class="cloudinary_cover_preview h-auto w-full max-w-xs rounded-lg border-2 border-zinc-200 object-cover shadow-lg"
+                    fallback-src="https://placehold.co/300x420/e2e8f0/94a3b8?text=No+Cover"
+                />
             </div>
 
             <!-- Input Ganti Gambar -->
             <div>
                 <label for="image" class="mb-1 block text-sm font-medium text-zinc-700">Ganti Gambar (opsional)</label>
-                <input type="file" id="image" name="image" accept="image/*"
+                <input type="file" id="image_input" name="image" accept="image/*"
                        @change="preview = URL.createObjectURL($event.target.files[0])"
                        class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500"/>
                 <p class="mt-1 text-xs text-zinc-500">Biarkan kosong jika tidak ingin mengubah gambar.</p>
@@ -47,4 +55,29 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById('image_input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const cloudinaryImg = document.querySelector('.cloudinary_cover_preview');
+        const preview = document.getElementById('cover_image_preview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // tampilkan preview
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+
+                // sembunyikan cloudinary image
+                if (cloudinaryImg) {
+                    cloudinaryImg.classList.add('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection
