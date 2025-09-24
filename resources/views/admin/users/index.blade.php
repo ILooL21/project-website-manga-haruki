@@ -83,7 +83,7 @@
                 <div class="flex items-center justify-end gap-2 pt-2">
                     <button type="button" @click="open=false"
                             class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">Batal</button>
-                    <button type="submit"
+                    <button type="submit" onclick="loading(event, this)"
                             class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Tambah</button>
                 </div>
             </form>
@@ -135,10 +135,10 @@
                                                 </a>
                                             </button>
                                             {{-- Form Hapus dengan Ikon --}}
-                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" title="Delete User" onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?');">
+                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" title="Delete User">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                                <button type="submit" onclick="loading(event, this, 'Apakah Anda yakin ingin menghapus user ini?')" class="text-red-500 hover:text-red-700">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5  hover:cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M6 3a1 1 0 00-1 1v1H3a1 1 0 000 2h1v9a2 2 0 002 2h8a2 2 0 002-2V7h1a1 1 0 100-2h-2V4a1 1 0 00-1-1H6zm3 4a1 1 0 012 0v6a1 1 0 01-2 0V7zm4 0a1 1 0 012 0v6a1 1 0 01-2 0V7z" clip-rule="evenodd" />
                                                     </svg>
@@ -162,6 +162,13 @@
     <div class="fixed bottom-5 right-5 z-50">
         <div class="rounded-lg bg-green-100 p-4 text-green-700 shadow-lg">
             <p><strong>Status:</strong> {{ session('status') }}</p>
+            <p>{{ session('message') }}</p>
+        </div>
+    </div>
+@elseif (session('error'))
+    <div class="fixed bottom-5 right-5 z-50">
+        <div class="rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
+            <p><strong>Error:</strong> {{ session('error') }}</p>
             <p>{{ session('message') }}</p>
         </div>
     </div>

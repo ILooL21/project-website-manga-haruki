@@ -59,7 +59,7 @@
                 <span class="block text-red-600 text-sm mb-4">{{ $message }}</span>
             @enderror
             <!-- Submit Button -->
-            <button type="submit"
+            <button type="submit" onclick="loading(event, this)"
                 class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition">
                 Login
             </button>

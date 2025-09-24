@@ -118,7 +118,7 @@
                     <div class="flex items-center justify-end gap-2 pt-2">
                         <button type="button" @click="open=false"
                             class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">Batal</button>
-                        <button type="submit"
+                        <button type="submit" onclick="loading(event, this)"
                             class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Simpan</button>
                     </div>
                 </form>
@@ -205,11 +205,10 @@
                                                     </svg>
                                                 </a>
                                                 <form action="{{ route('admin.mangas.destroy', $manga->id) }}"
-                                                    method="POST" class="inline" title="Delete Manga"
-                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus genre ini?');">
+                                                    method="POST" class="inline" title="Delete Manga">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit"
+                                                    <button type="submit" onclick="loading(event, this, 'Apakah Anda yakin ingin menghapus manga ini?')"
                                                         class="text-red-500 hover:underline hover:cursor-pointer">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                                             viewBox="0 0 20 20" fill="currentColor">

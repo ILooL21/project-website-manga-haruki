@@ -40,7 +40,7 @@
                 <span style="color: red;">{{ $message }}</span>
             @enderror
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" onclick="loading(event, this)">Register</button>
     </form>
     <br>
 </body>

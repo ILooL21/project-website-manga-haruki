@@ -120,7 +120,7 @@
                         <div class="flex items-center justify-end gap-2 pt-2">
                             <button type="button" @click="open=false"
                                     class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">Batal</button>
-                            <button type="submit"
+                            <button type="submit" onclick="loading(event, this)"
                                     class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Simpan</button>
                         </div>
                     </form>
@@ -160,10 +160,10 @@
                                                     <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
                                                         </svg>
                                                     </a>
-                                                    <form action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" class="inline" title="Delete Chapter" onsubmit="return confirm('Are you sure you want to delete this chapter?');">
+                                                    <form action="{{ route('admin.chapters.destroy', $chapter->id) }}" method="POST" class="inline" title="Delete Chapter">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-500 hover:underline">
+                                                        <button type="submit" onclick="loading(event, this, 'Apakah Anda yakin ingin menghapus chapter ini?')" class="text-red-500 hover:underline">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                 <path fill-rule="evenodd" d="M6 3a1 1 0 00-1 1v1H3a1 1 0 000 2h1v9a2 2 0 002 2h8a2 2 0 002-2V7h1a1 1 0 100-2h-2V4a1 1 0 00-1-1H6zm3 4a1 1 0 012 0v6a1 1 0 01-2 0V7zm4 0a1 1 0 012 0v6a1 1 0 01-2 0V7z" clip-rule="evenodd" />
                                                             </svg>
