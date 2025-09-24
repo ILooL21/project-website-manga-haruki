@@ -4,9 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GenreController;
-use App\Http\Controllers\ImageCloudinaryController;
 use App\Http\Controllers\LandingPage\HalamanAwalController;
-use App\Http\Controllers\LandingPage\MangaListController;
 use App\Http\Controllers\LandingPage\ProjectListController;
 use App\Http\Controllers\LandingPage\DetailMangaController;
 use App\Http\Controllers\LandingPage\MangaPagesController;
@@ -14,16 +12,6 @@ use App\Http\Controllers\MangaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-
-// Route untuk Cloudinary Image
-Route::resource('/image-cloudinary', ImageCloudinaryController::class)->names([
-    'index' => 'image.cloudinary.index',
-    'create' => 'image.cloudinary.create',
-    'store' => 'image.cloudinary.store',
-    'edit' => 'image.cloudinary.edit',
-    'update' => 'image.cloudinary.update',
-    'destroy' => 'image.cloudinary.destroy',
-]);
 
 // Rute untuk halaman awal
 Route::get('/', [HalamanAwalController::class, 'index'])->name('landing-page.index');
