@@ -106,7 +106,7 @@
                     <div class="flex items-center justify-end gap-2 pt-2">
                         <button type="button" @click="open=false"
                             class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">Batal</button>
-                        <button type="submit"
+                    <button type="submit" onclick="loading(event, this)"
                             class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Tambah</button>
                     </div>
                 </form>

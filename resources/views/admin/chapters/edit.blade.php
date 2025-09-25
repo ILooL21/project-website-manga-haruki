@@ -63,9 +63,9 @@
                 <div class="flex items-center justify-end gap-2 pt-2">
                     <button type="button" onclick="window.location='{{ route('admin.mangas.show', $chapter->manga_id) }}'"
                         class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 hover:cursor-pointer">
-                        Batal
-                    </button>
-                    <button type="submit"
+                    Batal
+                </button>
+                <button type="submit" onclick="loading(event, this)"
                         class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">Simpan</button>
                 </div>
             </form>

@@ -35,7 +35,7 @@
             @enderror
         </div>
 
-        <button type="submit">Update Profile</button>
+        <button type="submit" onclick="loading(event, this)">Update Profile</button>
     </form>
     <br>
 
@@ -61,7 +61,7 @@
             <input type="password" id="new_password_confirmation" name="new_password_confirmation" required>
         </div>
 
-        <button type="submit">Change Password</button>
+        <button type="submit" onclick="loading(event, this)">Change Password</button>
     </form>
     <br><br><br>
     @if (session('status'))
