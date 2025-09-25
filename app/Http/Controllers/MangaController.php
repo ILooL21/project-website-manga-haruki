@@ -92,9 +92,11 @@ class MangaController extends Controller
 
             DB::rollBack();
 
-            return redirect()->route('admin.mangas')->with([
+            // Redirect back to the form with input and a clear server error message
+            return redirect()->back()->withInput()->with([
                 'status' => 'failed',
-                'message' => 'gagal menambahkan manga.'
+                'message' => 'gagal menambahkan manga.',
+                'server_error' => $th->getMessage(),
             ]);
         }
     }
@@ -192,11 +194,12 @@ class MangaController extends Controller
             }
 
             DB::rollBack();
-            // Handle error
 
-            return redirect()->route('admin.mangas')->with([
+            // Redirect back to the edit form with input and server error info
+            return redirect()->back()->withInput()->with([
                 'status' => 'failed',
-                'message' => 'gagal mengupdate manga.'
+                'message' => 'gagal mengupdate manga.',
+                'server_error' => $th->getMessage(),
             ]);
         }
     }

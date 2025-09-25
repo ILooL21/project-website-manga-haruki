@@ -86,7 +86,7 @@
             <div class="col-span-12 md:col-span-6 lg:col-span-8 card bg-base-100 shadow-sm">
                 <!-- Iklan Section -->
                 <div class="flex flex-col items-center justify-center py-8">
-                    <span class="text-sm text-gray-500 mb-2">Sponsored</span>
+                    <span class="text-sm text-gray-500 mb-2">Iklan</span>
                     @if($iklanBanner && ($iklanBanner->image_path ?? null))
                         <figure>
                             <a href="{{ $iklanBanner->link ?? '#' }}" target="_blank" rel="noopener noreferrer">
@@ -150,11 +150,6 @@
                 <div class="card-body">
                     <h2 class="card-title mb-4">Projek Manga yang Dikerjakan</h2>
                     {{-- Projek Komik Section --}}
-                    @php
-                        // projek awal yang dirender dari server
-                        $projects = app(\App\Http\Controllers\LandingPage\HalamanAwalController::class)->latestProjects();
-                    @endphp
-
                     @include('landing-page.partials.projects_grid', ['projects' => $projects])
 
                     <script>

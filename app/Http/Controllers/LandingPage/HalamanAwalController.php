@@ -13,6 +13,7 @@ class HalamanAwalController extends Controller
 {
     public function index()
     {
+        $projects = app(\App\Http\Controllers\LandingPage\HalamanAwalController::class)->latestProjects();
         // load recent mangas with genres and chapters and map to a lightweight array for the hero
         $mangas = Manga::with(['genres', 'chapters'])->orderBy('created_at', 'desc')->take(6)->get()->map(function ($m) {
             return [
@@ -50,7 +51,7 @@ class HalamanAwalController extends Controller
 
         $iklanBanner = Iklan::orderBy('created_at', 'desc')->first();
 
-        return view('landing-page.halaman_awal', compact('mangas', 'newReleases', 'spotlight', 'iklanBanner'));
+        return view('landing-page.halaman_awal', compact('mangas', 'newReleases', 'spotlight', 'iklanBanner', 'projects'));
     }
 
     /**

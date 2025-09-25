@@ -22,14 +22,14 @@ class DetailMangaController extends Controller
         // load manga with relations by slug
         $manga = Manga::with(['genres', 'chapters'])->where('slug', $slug)->firstOrFail();
 
-    $coverUrl = $this->resolveCover($manga->cover_image);
+        $coverUrl = $this->resolveCover($manga->cover_image);
 
-    // paginate chapters for the detail page (15 per page)
-    $chapters = $manga->chapters()->orderBy('chapter_number', 'desc')->paginate(15);
+        // paginate chapters for the detail page (15 per page)
+        $chapters = $manga->chapters()->orderBy('chapter_number', 'desc')->paginate(15);
 
-    // determine the earliest (smallest) chapter number to start reading from
-    $firstChapter = $manga->chapters()->orderBy('chapter_number', 'asc')->first();
-    $firstChapterNumber = $firstChapter ? $firstChapter->chapter_number : 1;
+        // determine the earliest (smallest) chapter number to start reading from
+        $firstChapter = $manga->chapters()->orderBy('chapter_number', 'asc')->first();
+        $firstChapterNumber = $firstChapter ? $firstChapter->chapter_number : 1;
 
         return view('landing-page.manga_detail', compact('manga', 'coverUrl', 'chapters', 'firstChapterNumber'));
     }

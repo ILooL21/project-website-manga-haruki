@@ -1,6 +1,6 @@
 <div class="navbar bg-base-100 shadow-sm max-w-full">
     <div class="navbar-start">
-        <a class="btn btn-ghost text-xl font-bold text-purple-600">HarukiManga</a>
+        <a class="btn btn-ghost text-xl font-bold text-purple-600" href="{{ route('landing-page.index') }}">HarukiManga</a>
     </div>
     <div class="navbar-end flex items-center gap-6">
         <!-- Dropdown menu untuk layar kecil -->

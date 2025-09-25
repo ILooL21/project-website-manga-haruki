@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class ChapterController extends Controller
 {
-
     public function store(Request $request, $id)
     {
         $data = $request->validate([
@@ -20,17 +19,29 @@ class ChapterController extends Controller
             'release_date' => ['nullable', 'date'],
         ]);
 
-        $data['manga_id'] = $id;
-        $data['user_id'] = Auth::user()->id;
+        try {
+            $data['manga_id'] = $id;
+            $data['user_id'] = Auth::user()->id;
 
-        Chapter::create($data);
+            Chapter::create($data);
 
-        return redirect()
-            ->route('admin.mangas.show', $id)
-            ->with([
-                'status' => 'success',
-                'message' => 'Chapter berhasil ditambahkan.',
-            ]);
+            return redirect()
+                ->route('admin.mangas.show', $id)
+                ->with([
+                    'status' => 'success',
+                    'message' => 'Chapter berhasil ditambahkan.',
+                ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with([
+                    'status' => 'failed',
+                    'message' => 'Gagal menambahkan chapter.',
+                    'server_error' => $th->getMessage(),
+                ]);
+        }
     }
 
     public function edit($id)
@@ -49,36 +60,59 @@ class ChapterController extends Controller
             'release_date' => ['nullable', 'date'],
         ]);
 
-        $chapter->update($data);
+        try {
+            $chapter->update($data);
 
-        return redirect()
-            ->route('admin.mangas.show', $chapter->manga_id)
-            ->with([
-                'status' => 'success',
-                'message' => 'Chapter berhasil diperbarui.',
-            ]);
+            return redirect()
+                ->route('admin.mangas.show', $chapter->manga_id)
+                ->with([
+                    'status' => 'success',
+                    'message' => 'Chapter berhasil diperbarui.',
+                ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with([
+                    'status' => 'failed',
+                    'message' => 'Gagal memperbarui chapter.',
+                    'server_error' => $th->getMessage(),
+                ]);
+        }
     }
 
     public function destroy($id)
     {
-        $chapter = Chapter::findOrFail($id);
+        try {
+            $chapter = Chapter::findOrFail($id);
 
-        $chapter->pages()->each(function ($page) {
-            if ($page->image_public_id) {
-                Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
-            }
-        });
+            $chapter->pages()->each(function ($page) {
+                if ($page->image_public_id) {
+                    Cloudinary::uploadApi()->destroy($page->image_public_id, ['invalidate' => true]);
+                }
+            });
 
-        $chapter->pages()->delete();
+            $chapter->pages()->delete();
 
-        $chapter->delete();
+            $chapter->delete();
 
-        return redirect()
-            ->route('admin.mangas.show', $chapter->manga_id)
-            ->with([
-                'status' => 'success',
-                'message' => 'Chapter berhasil dihapus.',
-            ]);
+            return redirect()
+                ->route('admin.mangas.show', $chapter->manga_id)
+                ->with([
+                    'status' => 'success',
+                    'message' => 'Chapter berhasil dihapus.',
+                ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()
+                ->route('admin.mangas.show', isset($chapter) ? $chapter->manga_id : null)
+                ->with([
+                    'status' => 'failed',
+                    'message' => 'Gagal menghapus chapter.',
+                    'server_error' => $th->getMessage(),
+                ]);
+        }
     }
 
     public function viewPages($id)
@@ -106,7 +140,7 @@ class ChapterController extends Controller
         $validIds = $chapter->pages()->pluck('id')->map(fn($id) => (int) $id)->toArray();
         foreach ($validated['order'] as $row) {
             $rid = (int) $row['id'];
-            if (! in_array($rid, $validIds, true)) {
+            if (!in_array($rid, $validIds, true)) {
                 return response()->json(['message' => 'Invalid page id for this chapter.'], 422);
             }
         }
@@ -125,11 +159,14 @@ class ChapterController extends Controller
                 })
                 ->keyBy('id');
 
-            $chapter->pages()->get()->each(function ($page) use ($map) {
-                if (isset($map[$page->id])) {
-                    $page->update(['page_number' => $map[$page->id]['position']]);
-                }
-            });
+            $chapter
+                ->pages()
+                ->get()
+                ->each(function ($page) use ($map) {
+                    if (isset($map[$page->id])) {
+                        $page->update(['page_number' => $map[$page->id]['position']]);
+                    }
+                });
         });
 
         return response()->json(['message' => 'Order updated', 'status' => 'success']);
@@ -143,35 +180,47 @@ class ChapterController extends Controller
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $files = $request->file('images');
-        if ($files) {
-            DB::transaction(function () use ($files, $chapter) {
-                $maxPageNumber = $chapter->pages()->max('page_number') ?? 0;
+        try {
+            $files = $request->file('images');
+            if ($files) {
+                DB::transaction(function () use ($files, $chapter) {
+                    $maxPageNumber = $chapter->pages()->max('page_number') ?? 0;
 
-                foreach ($files as $index => $file) {
-                    $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                        'folder' => 'pages',
-                        'resource_type' => 'image',
-                    ]);
-                    $pagesUrl = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
-                    $coverPublicId = $uploaded['public_id'] ?? null;
+                    foreach ($files as $index => $file) {
+                        $uploaded = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                            'folder' => 'pages',
+                            'resource_type' => 'image',
+                        ]);
+                        $pagesUrl = $uploaded['secure_url'] ?? ($uploaded['url'] ?? null);
+                        $coverPublicId = $uploaded['public_id'] ?? null;
 
-                    Page::create([
-                        'chapter_id' => $chapter->id,
-                        'page_number' => $maxPageNumber + $index + 1,
-                        'image_url' => $pagesUrl,
-                        'image_public_id' => $coverPublicId,
-                    ]);
-                }
-            });
+                        Page::create([
+                            'chapter_id' => $chapter->id,
+                            'page_number' => $maxPageNumber + $index + 1,
+                            'image_url' => $pagesUrl,
+                            'image_public_id' => $coverPublicId,
+                        ]);
+                    }
+                });
+            }
+
+            return redirect()
+                ->route('admin.chapters.pages', $chapter->id)
+                ->with([
+                    'status' => 'success',
+                    'message' => 'Pages berhasil ditambahkan.',
+                ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with([
+                    'status' => 'failed',
+                    'message' => 'Gagal menambahkan pages.',
+                    'server_error' => $th->getMessage(),
+                ]);
         }
-
-        return redirect()
-            ->route('admin.chapters.pages', $chapter->id)
-            ->with([
-                'status' => 'success',
-                'message' => 'Pages berhasil ditambahkan.',
-            ]);
     }
 
     public function editPages($id)
@@ -204,7 +253,7 @@ class ChapterController extends Controller
 
             // hapus gambar lama
             if ($request->hasFile('image') && $page->image_public_id) {
-                Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
+                Cloudinary::uploadApi()->destroy($page->image_public_id, ['invalidate' => true]);
             }
 
             $page->update($data);
@@ -234,7 +283,7 @@ class ChapterController extends Controller
 
         // hapus gambar
         if ($page->image_public_id) {
-            Cloudinary::uploadApi()->destroy($page->image_public_id, ["invalidate" => true]);
+            Cloudinary::uploadApi()->destroy($page->image_public_id, ['invalidate' => true]);
         }
 
         $page->delete();

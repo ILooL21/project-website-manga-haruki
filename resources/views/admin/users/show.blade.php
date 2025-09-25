@@ -8,6 +8,14 @@
         email:'{{ $userData->email }}', 
         role:'{{ $userData->role }}'
     }">
+        @if(session('server_error'))
+            <div class="container mx-auto px-4 pt-4 lg:px-8">
+                <div class="rounded border border-red-200 bg-red-50 p-3 text-red-700 mb-4">
+                    <strong>Server error:</strong>
+                    <div class="mt-1">{{ session('server_error') }}</div>
+                </div>
+            </div>
+        @endif
         <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
             <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">
                 <div class="grow">

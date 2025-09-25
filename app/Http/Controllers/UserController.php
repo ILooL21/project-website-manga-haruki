@@ -37,17 +37,26 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
         ]);
+        try {
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('admin.users')->with([
-            'status' => 'success',
-            'message' => 'User created successfully.'
-        ]);
+            return redirect()->route('admin.users')->with([
+                'status' => 'success',
+                'message' => 'User created successfully.'
+            ]);
+        } catch (\Throwable $th) {
+            // Log and redirect back with input and server error
+            report($th);
+            return redirect()->back()->withInput()->with([
+                'status' => 'failed',
+                'message' => 'Gagal membuat user.',
+                'server_error' => $th->getMessage(),
+            ]);
+        }
     }
 
     public function update(Request $request, $id)
@@ -61,30 +70,48 @@ class UserController extends Controller
             'role' => 'required|string|in:User,Admin',
         ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->role = $request->role;
+        try {
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->role = $request->role;
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+
+            return redirect()->route('admin.users')->with([
+                'status' => 'success',
+                'message' => 'User updated successfully.'
+            ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()->back()->withInput()->with([
+                'status' => 'failed',
+                'message' => 'Gagal mengupdate user.',
+                'server_error' => $th->getMessage(),
+            ]);
         }
-
-        $user->save();
-
-        return redirect()->route('admin.users')->with([
-            'status' => 'success',
-            'message' => 'User updated successfully.'
-        ]);
     }
 
     public function destroy($id)
     {
         // Logika untuk menghapus pengguna
-        $user = User::findOrFail($id);
-        $user->delete();
-        return redirect()->route('admin.users')->with([
-            'status' => 'success',
-            'message' => 'User deleted successfully.'
-        ]);
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            return redirect()->route('admin.users')->with([
+                'status' => 'success',
+                'message' => 'User deleted successfully.'
+            ]);
+        } catch (\Throwable $th) {
+            report($th);
+            return redirect()->route('admin.users')->with([
+                'status' => 'failed',
+                'message' => 'Gagal menghapus user.',
+                'server_error' => $th->getMessage(),
+            ]);
+        }
     }
 }

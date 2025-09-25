@@ -4,10 +4,10 @@
 
 @section('content')
     <div x-data="{ 
-        title:'{{ $mangaData->title }}', 
-        description:'{{ $mangaData->description }}', 
-        status:'{{ $mangaData->status }}',
-        genresText:'{{ $mangaData->genres ? $mangaData->genres->pluck('name')->join(', ') : "" }}'
+        title:'{{ old('title', $mangaData->title) }}', 
+        description:'{{ old('description', $mangaData->description) }}', 
+        status:'{{ old('status', $mangaData->status) }}',
+        genresText:'{{ old('genres', $mangaData->genres ? $mangaData->genres->pluck('name')->join(', ') : "") }}'
     }">
         <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
             <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">
@@ -22,6 +22,26 @@
                  method="POST" class="space-y-4 py-5">
                 @csrf
                 @method('PUT')
+
+                {{-- show validation errors --}}
+                @if ($errors->any())
+                    <div class="mb-2 rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                        <strong>Terjadi kesalahan:</strong>
+                        <ul class="mt-1 list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                {{-- server error --}}
+                @if(session('server_error'))
+                    <div class="mb-2 rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                        <strong>Server error:</strong>
+                        <div class="truncate">{{ session('server_error') }}</div>
+                    </div>
+                @endif
                 <div>
                     <label for="cover_image_input" class="mb-1 block text-sm font-medium text-zinc-700">Cover Image</label>
                     <div class="mb-2">

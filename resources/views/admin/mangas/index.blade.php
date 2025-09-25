@@ -15,7 +15,7 @@
 @section('content')
 
     <div
-        x-data='{ open:false, title:"", description:"", status:"ongoing", genresText:"", authorName: "", reset(){ this.title=""; this.description=""; this.status="ongoing"; this.genresText=""; this.authorName = ""; } }'>
+        x-data='{ open: {{ old() ? 'true' : 'false' }}, title: "{{ old('title', '') }}", description: "{{ old('description', '') }}", status: "{{ old('status', 'Ongoing') }}", genresText: "{{ old('genres', '') }}", authorName: "{{ old('author_name', '') }}", reset(){ this.title=""; this.description=""; this.status="Ongoing"; this.genresText=""; this.authorName = ""; } }'>
         <!-- Page Heading -->
         <div class="container mx-auto px-4 pt-6 lg:px-8 lg:pt-8">
             <div class="flex flex-col gap-2 text-center sm:flex-row sm:items-center sm:justify-between sm:text-start">
@@ -57,6 +57,25 @@
                 <form action="{{ route('admin.mangas.store') }}" method="POST" enctype="multipart/form-data"
                     class="space-y-4 p-5">
                     @csrf
+                    {{-- show validation errors --}}
+                    @if ($errors->any())
+                        <div class="mb-2 rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                            <strong>Terjadi kesalahan:</strong>
+                            <ul class="mt-1 list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- show server error if any --}}
+                    @if(session('server_error'))
+                        <div class="mb-2 rounded border border-red-200 bg-red-50 p-3 text-red-700">
+                            <strong>Server error:</strong>
+                            <div class="truncate">{{ session('server_error') }}</div>
+                        </div>
+                    @endif
                     <div>
                         <label for="title" class="mb-1 block text-sm font-medium text-zinc-700">Judul</label>
                         <input x-model.trim="title" type="text" id="title" name="title" required
