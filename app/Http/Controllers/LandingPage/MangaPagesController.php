@@ -5,7 +5,6 @@ namespace App\Http\Controllers\LandingPage;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Manga;
-use Illuminate\Http\Request;
 
 class MangaPagesController extends Controller
 {
@@ -34,12 +33,20 @@ class MangaPagesController extends Controller
             ->orderBy('chapter_number', 'asc')
             ->first();
 
+        $comments_count = $chapter->comments()->count();
+        $comments = $chapter->mainComments()
+            ->with('user', 'replies')
+            ->latest()
+            ->get();
+
         return view('landing-page.manga_pages', [
             'manga' => $manga,
             'chapter' => $chapter,
             'pages' => $pages,
             'previousChapter' => $previousChapter ? $previousChapter->chapter_number : null,
             'nextChapter' => $nextChapter ? $nextChapter->chapter_number : null,
+            'comments_count' => $comments_count,
+            'comments' => $comments,
         ]);
     }
 

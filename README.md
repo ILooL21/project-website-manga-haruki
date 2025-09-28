@@ -128,8 +128,10 @@ Follow these steps to set up the project locally:
 
 -   PHP >= 8.2
 -   Composer
--   Node.js & npm >= 18.0
--   A database (e.g., MySQL, PostgreSQL, SQLite)
+-   Node.js >= 20.19.0
+-   MariaDB or MySQL
+-   Cloudinary Account
+-   Google OAuth Credentials
 
 ## License
 

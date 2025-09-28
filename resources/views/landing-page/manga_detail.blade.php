@@ -68,8 +68,5 @@
                 @endif
             </div>
         </div>
-
-        <!-- Comment Section -->
-        @include("landing-page.partials.comment_section")
     </div>
 @endsection

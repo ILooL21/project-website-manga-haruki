@@ -44,6 +44,13 @@
                 <img src="{{ asset('storage/' . $page->image_url) }}" alt="Manga Page" class="w-full mb-4 rounded-lg border-4 border-base-200/40">
             @endforeach
         </div>
+
+        @include('landing-page.partials.comment_section', [
+            'comments_count' => $comments_count,
+            'comments' => $comments,
+            'chapter' => $chapter,
+            'slug' => $manga->slug
+        ])
     </div>
 
     <script>

@@ -8,6 +8,8 @@ use App\Http\Controllers\LandingPage\HalamanAwalController;
 use App\Http\Controllers\LandingPage\ProjectListController;
 use App\Http\Controllers\LandingPage\DetailMangaController;
 use App\Http\Controllers\LandingPage\MangaPagesController;
+use App\Http\Controllers\LandingPage\CommentController;
+use App\Http\Controllers\IklanController;
 use App\Http\Controllers\MangaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('profile/change-password', [AuthController::class, 'changePassword'])->name('profile.change_password');
 
+    Route::post('comments', [CommentController::class, 'store'])->name('comments.store');
+
     // route yang dapat diakses oleh user dengan Super Admin saja
     Route::middleware('role:Super Admin')->group(function () {
         // route admin untuk users
@@ -67,11 +71,11 @@ Route::middleware('auth')->group(function () {
         Route::delete('admin/genres/{id}', [GenreController::class, 'destroy'])->name('admin.genres.destroy');
 
         // route admin untuk iklan (ads)
-        Route::get('admin/iklan', [\App\Http\Controllers\IklanController::class, 'index'])->name('admin.iklan');
-        Route::post('admin/iklan', [\App\Http\Controllers\IklanController::class, 'store'])->name('admin.iklan.store');
-        Route::get('admin/iklan/{id}/edit', [\App\Http\Controllers\IklanController::class, 'edit'])->name('admin.iklan.edit');
-        Route::put('admin/iklan/{id}', [\App\Http\Controllers\IklanController::class, 'update'])->name('admin.iklan.update');
-        Route::delete('admin/iklan/{id}', [\App\Http\Controllers\IklanController::class, 'destroy'])->name('admin.iklan.destroy');
+        Route::get('admin/iklan', [IklanController::class, 'index'])->name('admin.iklan');
+        Route::post('admin/iklan', [IklanController::class, 'store'])->name('admin.iklan.store');
+        Route::get('admin/iklan/{id}/edit', [IklanController::class, 'edit'])->name('admin.iklan.edit');
+        Route::put('admin/iklan/{id}', [IklanController::class, 'update'])->name('admin.iklan.update');
+        Route::delete('admin/iklan/{id}', [IklanController::class, 'destroy'])->name('admin.iklan.destroy');
 
         // route admin untuk manga
         Route::get('admin/mangas', [MangaController::class, 'index'])->name('admin.mangas');

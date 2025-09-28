@@ -41,4 +41,16 @@ class Chapter extends Model
     {
         return $this->hasMany(Page::class);
     }
+
+    // Relasi ke semua komentar
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    // Hanya mengambil komentar utama (akar dari tree)
+    public function mainComments()
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id');
+    }
 }
