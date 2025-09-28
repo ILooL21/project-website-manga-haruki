@@ -1,6 +1,6 @@
 <footer class="bg-neutral text-neutral-content" style="width:100%;margin:0;box-sizing:border-box;">
   <div class="w-full max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-  <aside class="grid-flow-col items-center flex items-center gap-3">
+  <aside class="grid-flow-col items-center flex gap-3">
     <svg
       width="36"
       height="36"

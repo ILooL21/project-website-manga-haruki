@@ -1,72 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>
-        Profile {{ $user->name }}
-    </title>
-</head>
-<body>
-    <h1>Profile of {{ $user->name }}</h1>
+@extends('landing-page.layouts.main')
 
-    <h2>
-        Edit Profile
-    </h2>
+@section('title', 'My Profile')
 
-    <form action="{{ route('profile.update') }}" method="POST">
-        @csrf
-        @method('PUT')
+@section('content')
+<div class="bg-base-100 text-base-content min-h-screen p-4 sm:p-8">
+    <div class="max-w-2xl mx-auto">
 
-        <div>
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-            @error('name')
-                <p>{{ $message }}</p>
-            @enderror
+            <h1 class="text-4xl font-bold mb-8">My Profile</h1>
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">
+                    Edit Profile Information
+                </h2>
+
+                <form action="{{ route('profile.update') }}" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-400">Name:</label>
+                        <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required
+                            class=" w-full p-3 border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-400">Email:</label>
+                        <span class="block mb-2 text-lg font-medium text-gray-400">{{ $user->email }}</span>
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <button type="submit" onclick="loading(event, this)"
+                            class="btn btn-primary w-full md:w-auto py-2">
+                        Update Profile
+                    </button>
+                </form>
+            </div>
+
+            <hr class="border-slate-700 my-10">
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">
+                    Change Password
+                </h2>
+                <form action="{{ route('profile.change_password') }}" method="POST" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div>
+                        <label for="new_password" class="block mb-2 text-sm font-medium text-gray-400">New Password:</label>
+                        <input type="password" id="new_password" name="new_password" required
+                            class="w-full p-3 border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="new_password_confirmation" class="block mb-2 text-sm font-medium text-gray-400">Confirm New Password:</label>
+                        <input type="password" id="new_password_confirmation" name="new_password_confirmation" required
+                            class="w-full p-3 border border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <button type="submit" onclick="loading(event, this)"
+                            class="btn btn-primary w-full md:w-auto py-2">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+
         </div>
+</div>
 
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required>
-            @error('email')
-                <p>{{ $message }}</p>
-            @enderror
+@if (session('status'))
+    <div class="fixed bottom-5 right-5 z-50">
+        <div class="rounded-lg bg-green-100 p-4 text-green-700 shadow-lg">
+            <p><strong>Status:</strong> {{ session('status') }}</p>
+            <p>{{ session('message') }}</p>
         </div>
-
-        <button type="submit" onclick="loading(event, this)">Update Profile</button>
-    </form>
-    <br>
-
-    {{-- form ganti password --}}
-    <h2>
-        Change Password
-    </h2>
-    <form action="{{ route('profile.change_password') }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div>
-            <label for="current_password">Current Password:</label>
-            <input type="password" id="current_password" name="current_password" required>
-        </div>
-
-        <div>
-            <label for="new_password">New Password:</label>
-            <input type="password" id="new_password" name="new_password" required>
-        </div>
-
-        <div>
-            <label for="new_password_confirmation">Confirm New Password:</label>
-            <input type="password" id="new_password_confirmation" name="new_password_confirmation" required>
-        </div>
-
-        <button type="submit" onclick="loading(event, this)">Change Password</button>
-    </form>
-    <br><br><br>
-    @if (session('status'))
-        <p>Status: {{ session('status') }}</p>
-        <p>Message: {{ session('message') }}</p>
-    @endif
-</body>
-</html>
+    </div>
+@endif
+@endsection

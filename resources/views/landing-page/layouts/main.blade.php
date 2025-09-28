@@ -47,12 +47,12 @@
 
     <!-- Footer -->
     @include('landing-page.layouts.footer')
-            <script>
-                document.addEventListener('DOMContentLoaded', function(){
-                    var el = document.getElementById('themeToggle');
-                    if (el && window.syncThemeToggle) window.syncThemeToggle(el);
-                });
-            </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            var el = document.getElementById('themeToggle');
+            if (el && window.syncThemeToggle) window.syncThemeToggle(el);
+        });
+    </script>
 </body>
 
 </html>

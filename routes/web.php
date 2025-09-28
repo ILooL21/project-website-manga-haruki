@@ -21,11 +21,15 @@ Route::get('/manga/{slug}', [DetailMangaController::class, 'index'])->name('land
 Route::get('/manga/{slug}/chapter/{chapter_number}', [MangaPagesController::class, 'show'])->name('landing-page.manga_pages');
 Route::get('/manga-dummy/chapter/{chapter}', [MangaPagesController::class, 'indexDummy'])->name('landing-page.manga_pages_dummy');
 
+// Rute untuk autentikasi dengan Google
+Route::get('auth/google-callback', [AuthController::class, 'handleGoogleCallback'])->name('login.google.callback');
+
 // Rute untuk pengguna yang belum terautentikasi.
 Route::middleware('guest')->group(function () {
     // route untuk login
     Route::get('login', [AuthController::class, 'index'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
+    Route::get('login/google', [AuthController::class, 'loginGoogle'])->name('login.google');
 
     // route untuk registrasi
     Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
